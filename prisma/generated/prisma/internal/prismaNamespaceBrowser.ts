@@ -297,6 +297,8 @@ export const UserScalarFieldEnum = {
   notifications_enabled: 'notifications_enabled',
   language: 'language',
   refreshToken: 'refreshToken',
+  resetPasswordToken: 'resetPasswordToken',
+  resetPasswordExpires: 'resetPasswordExpires',
   created_at: 'created_at',
   updated_at: 'updated_at',
   deleted_at: 'deleted_at'
@@ -424,7 +426,8 @@ export const UserOrderByRelevanceFieldEnum = {
   email: 'email',
   password: 'password',
   language: 'language',
-  refreshToken: 'refreshToken'
+  refreshToken: 'refreshToken',
+  resetPasswordToken: 'resetPasswordToken'
 } as const
 
 export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum]

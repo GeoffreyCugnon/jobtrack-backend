@@ -17,6 +17,23 @@ export class AuthService {
     return await argon2.verify(hashed, notHashed);
   }
 
+  /**
+   * Vérifie un token de réinitialisation de mot de passe : présent, non expiré,
+   * et correspondant (argon2) au hash stocké en DB sur l'utilisateur.
+   */
+  async verifyResetToken(
+    rawToken: string,
+    user: Pick<User, 'resetPasswordToken' | 'resetPasswordExpires'>,
+  ): Promise<boolean> {
+    if (!user.resetPasswordToken || !user.resetPasswordExpires) {
+      return false;
+    }
+    if (user.resetPasswordExpires.getTime() < Date.now()) {
+      return false;
+    }
+    return this.compare(rawToken, user.resetPasswordToken);
+  }
+
   async generateJwts(
     user: User,
   ): Promise<{ accessToken: string; refreshToken: string }> {

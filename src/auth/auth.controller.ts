@@ -10,6 +10,7 @@ import {
   Patch,
   UseGuards,
 } from '@nestjs/common';
+import { randomBytes } from 'node:crypto';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/Login.dto';
@@ -19,6 +20,8 @@ import type { Request } from 'express';
 import { User } from '../../prisma/generated/prisma/client';
 import { AuthGuard } from './guards/auth.guard';
 import { ChangePasswordDto } from './dto/changePassword.dto';
+import { ForgotPasswordDto } from './dto/forgotPassword.dto';
+import { ResetPasswordDto } from './dto/resetPassword.dto';
 import type { IRequestWithPayload } from './interface';
 import { SafeUser } from '../user/interface/partielUser';
 import { toSafeUser } from '../user/user.utils';
@@ -126,6 +129,80 @@ export class AuthController {
     this.authService.clearTokenCookie(response);
 
     return { message: 'Déconnexion réussie' };
+  }
+
+  /**
+   * Étape 1 du "mot de passe oublié" : génère un token de réinitialisation à
+   * durée de vie courte (15 min), le stocke hashé (argon2) sur l'utilisateur.
+   * Réponse volontairement générique (pas d'énumération de comptes).
+   *
+   * LIMITATION : aucun service d'envoi d'email n'est configuré sur ce projet —
+   * en dev, le lien de réinitialisation est écrit dans les logs serveur.
+   */
+  @Post('forgot-password')
+  async forgotPassword(
+    @Body() body: ForgotPasswordDto,
+  ): Promise<{ message: string }> {
+    const genericResponse = {
+      message:
+        'Si un compte existe pour cette adresse, un lien de réinitialisation vient d’être envoyé.',
+    };
+
+    if ((await this.userService.countByEmail(body.email)) === 0) {
+      return genericResponse;
+    }
+
+    const user = await this.userService.findByEmailOrThrow(body.email);
+    const token = randomBytes(32).toString('hex');
+    const hashedToken = await this.authService.hash(token);
+    const expires = new Date(Date.now() + 15 * 60 * 1000);
+
+    await this.userService.update(user.id, {
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: expires,
+    });
+
+    const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:5173';
+    const resetUrl = `${frontendUrl}/auth/reset-password?email=${encodeURIComponent(
+      user.email,
+    )}&token=${token}`;
+    Logger.log(
+      `[DEV] Lien de réinitialisation pour ${user.email} : ${resetUrl}`,
+      AuthController.name,
+    );
+
+    return genericResponse;
+  }
+
+  /**
+   * Étape 2 du "mot de passe oublié" : consomme le token (email + token +
+   * nouveau mot de passe), met à jour le hash argon2, invalide le token de
+   * réinitialisation ET le refresh token (force une reconnexion).
+   */
+  @Post('reset-password')
+  async resetPassword(
+    @Body() body: ResetPasswordDto,
+  ): Promise<{ message: string }> {
+    try {
+      const user = await this.userService.findByEmailOrThrow(body.email);
+
+      if (!(await this.authService.verifyResetToken(body.token, user))) {
+        throw new Error('Token de réinitialisation invalide ou expiré');
+      }
+
+      const hashedPassword = await this.authService.hash(body.newPassword);
+      await this.userService.update(user.id, {
+        password: hashedPassword,
+        resetPasswordToken: null,
+        resetPasswordExpires: null,
+        refreshToken: null,
+      });
+
+      return { message: 'Mot de passe réinitialisé avec succès' };
+    } catch (error) {
+      Logger.warn(error);
+      throw new BadRequestException();
+    }
   }
 
   @Patch('password')

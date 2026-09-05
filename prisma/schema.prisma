@@ -242,7 +242,9 @@ model User {
   password                                     String             @db.VarChar(255)
   notifications_enabled                        Boolean            @default(true)
   language                                     String             @default("fr")
-  refreshToken                                 String?            @db.LongText          
+  refreshToken                                 String?            @db.LongText
+  resetPasswordToken                           String?            @db.VarChar(255)
+  resetPasswordExpires                         DateTime?          @db.Timestamp(0)
   created_at                                   DateTime           @default(now()) @db.Timestamp(0)
   updated_at                                   DateTime           @default(now()) @db.Timestamp(0)
   deleted_at                                   DateTime?          @db.Timestamp(0)

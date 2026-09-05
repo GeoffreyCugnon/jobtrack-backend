@@ -46,6 +46,8 @@ export type UserMinAggregateOutputType = {
   notifications_enabled: boolean | null
   language: string | null
   refreshToken: string | null
+  resetPasswordToken: string | null
+  resetPasswordExpires: Date | null
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
@@ -61,6 +63,8 @@ export type UserMaxAggregateOutputType = {
   notifications_enabled: boolean | null
   language: string | null
   refreshToken: string | null
+  resetPasswordToken: string | null
+  resetPasswordExpires: Date | null
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
@@ -76,6 +80,8 @@ export type UserCountAggregateOutputType = {
   notifications_enabled: number
   language: number
   refreshToken: number
+  resetPasswordToken: number
+  resetPasswordExpires: number
   created_at: number
   updated_at: number
   deleted_at: number
@@ -103,6 +109,8 @@ export type UserMinAggregateInputType = {
   notifications_enabled?: true
   language?: true
   refreshToken?: true
+  resetPasswordToken?: true
+  resetPasswordExpires?: true
   created_at?: true
   updated_at?: true
   deleted_at?: true
@@ -118,6 +126,8 @@ export type UserMaxAggregateInputType = {
   notifications_enabled?: true
   language?: true
   refreshToken?: true
+  resetPasswordToken?: true
+  resetPasswordExpires?: true
   created_at?: true
   updated_at?: true
   deleted_at?: true
@@ -133,6 +143,8 @@ export type UserCountAggregateInputType = {
   notifications_enabled?: true
   language?: true
   refreshToken?: true
+  resetPasswordToken?: true
+  resetPasswordExpires?: true
   created_at?: true
   updated_at?: true
   deleted_at?: true
@@ -235,6 +247,8 @@ export type UserGroupByOutputType = {
   notifications_enabled: boolean
   language: string
   refreshToken: string | null
+  resetPasswordToken: string | null
+  resetPasswordExpires: Date | null
   created_at: Date
   updated_at: Date
   deleted_at: Date | null
@@ -273,6 +287,8 @@ export type UserWhereInput = {
   notifications_enabled?: Prisma.BoolFilter<"User"> | boolean
   language?: Prisma.StringFilter<"User"> | string
   refreshToken?: Prisma.StringNullableFilter<"User"> | string | null
+  resetPasswordToken?: Prisma.StringNullableFilter<"User"> | string | null
+  resetPasswordExpires?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"User"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"User"> | Date | string
   deleted_at?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
@@ -300,6 +316,8 @@ export type UserOrderByWithRelationInput = {
   notifications_enabled?: Prisma.SortOrder
   language?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  resetPasswordToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  resetPasswordExpires?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -331,6 +349,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   notifications_enabled?: Prisma.BoolFilter<"User"> | boolean
   language?: Prisma.StringFilter<"User"> | string
   refreshToken?: Prisma.StringNullableFilter<"User"> | string | null
+  resetPasswordToken?: Prisma.StringNullableFilter<"User"> | string | null
+  resetPasswordExpires?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"User"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"User"> | Date | string
   deleted_at?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
@@ -358,6 +378,8 @@ export type UserOrderByWithAggregationInput = {
   notifications_enabled?: Prisma.SortOrder
   language?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  resetPasswordToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  resetPasswordExpires?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -381,6 +403,8 @@ export type UserScalarWhereWithAggregatesInput = {
   notifications_enabled?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   language?: Prisma.StringWithAggregatesFilter<"User"> | string
   refreshToken?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  resetPasswordToken?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  resetPasswordExpires?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   created_at?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
@@ -394,6 +418,8 @@ export type UserCreateInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -421,6 +447,8 @@ export type UserUncheckedCreateInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -445,6 +473,8 @@ export type UserUpdateInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -472,6 +502,8 @@ export type UserUncheckedUpdateInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -498,6 +530,8 @@ export type UserCreateManyInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -511,6 +545,8 @@ export type UserUpdateManyMutationInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -526,6 +562,8 @@ export type UserUncheckedUpdateManyInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -562,6 +600,8 @@ export type UserCountOrderByAggregateInput = {
   notifications_enabled?: Prisma.SortOrder
   language?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrder
+  resetPasswordToken?: Prisma.SortOrder
+  resetPasswordExpires?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
@@ -582,6 +622,8 @@ export type UserMaxOrderByAggregateInput = {
   notifications_enabled?: Prisma.SortOrder
   language?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrder
+  resetPasswordToken?: Prisma.SortOrder
+  resetPasswordExpires?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
@@ -597,6 +639,8 @@ export type UserMinOrderByAggregateInput = {
   notifications_enabled?: Prisma.SortOrder
   language?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrder
+  resetPasswordToken?: Prisma.SortOrder
+  resetPasswordExpires?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
@@ -811,6 +855,8 @@ export type UserCreateWithoutApplicationInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -837,6 +883,8 @@ export type UserUncheckedCreateWithoutApplicationInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -876,6 +924,8 @@ export type UserUpdateWithoutApplicationInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -902,6 +952,8 @@ export type UserUncheckedUpdateWithoutApplicationInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -925,6 +977,8 @@ export type UserCreateWithoutCommentInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -951,6 +1005,8 @@ export type UserUncheckedCreateWithoutCommentInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -990,6 +1046,8 @@ export type UserUpdateWithoutCommentInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1016,6 +1074,8 @@ export type UserUncheckedUpdateWithoutCommentInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1039,6 +1099,8 @@ export type UserCreateWithoutCompany_followerInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -1065,6 +1127,8 @@ export type UserUncheckedCreateWithoutCompany_followerInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -1104,6 +1168,8 @@ export type UserUpdateWithoutCompany_followerInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1130,6 +1196,8 @@ export type UserUncheckedUpdateWithoutCompany_followerInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1153,6 +1221,8 @@ export type UserCreateWithoutConnection_connection_user_action_idTouserInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -1179,6 +1249,8 @@ export type UserUncheckedCreateWithoutConnection_connection_user_action_idTouser
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -1207,6 +1279,8 @@ export type UserCreateWithoutConnection_connection_user_receiver_idTouserInput =
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -1233,6 +1307,8 @@ export type UserUncheckedCreateWithoutConnection_connection_user_receiver_idTous
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -1272,6 +1348,8 @@ export type UserUpdateWithoutConnection_connection_user_action_idTouserInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1298,6 +1376,8 @@ export type UserUncheckedUpdateWithoutConnection_connection_user_action_idTouser
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1332,6 +1412,8 @@ export type UserUpdateWithoutConnection_connection_user_receiver_idTouserInput =
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1358,6 +1440,8 @@ export type UserUncheckedUpdateWithoutConnection_connection_user_receiver_idTous
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1381,6 +1465,8 @@ export type UserCreateWithoutEmploymentInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -1407,6 +1493,8 @@ export type UserUncheckedCreateWithoutEmploymentInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -1446,6 +1534,8 @@ export type UserUpdateWithoutEmploymentInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1472,6 +1562,8 @@ export type UserUncheckedUpdateWithoutEmploymentInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1495,6 +1587,8 @@ export type UserCreateWithoutMessage_message_recipient_idTouserInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -1521,6 +1615,8 @@ export type UserUncheckedCreateWithoutMessage_message_recipient_idTouserInput = 
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -1549,6 +1645,8 @@ export type UserCreateWithoutMessage_message_sender_idTouserInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -1575,6 +1673,8 @@ export type UserUncheckedCreateWithoutMessage_message_sender_idTouserInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -1614,6 +1714,8 @@ export type UserUpdateWithoutMessage_message_recipient_idTouserInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1640,6 +1742,8 @@ export type UserUncheckedUpdateWithoutMessage_message_recipient_idTouserInput = 
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1674,6 +1778,8 @@ export type UserUpdateWithoutMessage_message_sender_idTouserInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1700,6 +1806,8 @@ export type UserUncheckedUpdateWithoutMessage_message_sender_idTouserInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1723,6 +1831,8 @@ export type UserCreateWithoutNotificationInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -1749,6 +1859,8 @@ export type UserUncheckedCreateWithoutNotificationInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -1788,6 +1900,8 @@ export type UserUpdateWithoutNotificationInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1814,6 +1928,8 @@ export type UserUncheckedUpdateWithoutNotificationInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1837,6 +1953,8 @@ export type UserCreateWithoutPublicationInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -1863,6 +1981,8 @@ export type UserUncheckedCreateWithoutPublicationInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -1902,6 +2022,8 @@ export type UserUpdateWithoutPublicationInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1928,6 +2050,8 @@ export type UserUncheckedUpdateWithoutPublicationInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1951,6 +2075,8 @@ export type UserCreateWithoutRoleInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -1976,6 +2102,8 @@ export type UserUncheckedCreateWithoutRoleInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -2031,6 +2159,8 @@ export type UserScalarWhereInput = {
   notifications_enabled?: Prisma.BoolFilter<"User"> | boolean
   language?: Prisma.StringFilter<"User"> | string
   refreshToken?: Prisma.StringNullableFilter<"User"> | string | null
+  resetPasswordToken?: Prisma.StringNullableFilter<"User"> | string | null
+  resetPasswordExpires?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"User"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"User"> | Date | string
   deleted_at?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
@@ -2044,6 +2174,8 @@ export type UserCreateWithoutUser_skillInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -2070,6 +2202,8 @@ export type UserUncheckedCreateWithoutUser_skillInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -2109,6 +2243,8 @@ export type UserUpdateWithoutUser_skillInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2135,6 +2271,8 @@ export type UserUncheckedUpdateWithoutUser_skillInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2159,6 +2297,8 @@ export type UserCreateManyRoleInput = {
   notifications_enabled?: boolean
   language?: string
   refreshToken?: string | null
+  resetPasswordToken?: string | null
+  resetPasswordExpires?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
   deleted_at?: Date | string | null
@@ -2172,6 +2312,8 @@ export type UserUpdateWithoutRoleInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2197,6 +2339,8 @@ export type UserUncheckedUpdateWithoutRoleInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2222,6 +2366,8 @@ export type UserUncheckedUpdateManyWithoutRoleInput = {
   notifications_enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   language?: Prisma.StringFieldUpdateOperationsInput | string
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetPasswordExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2358,6 +2504,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   notifications_enabled?: boolean
   language?: boolean
   refreshToken?: boolean
+  resetPasswordToken?: boolean
+  resetPasswordExpires?: boolean
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
@@ -2388,12 +2536,14 @@ export type UserSelectScalar = {
   notifications_enabled?: boolean
   language?: boolean
   refreshToken?: boolean
+  resetPasswordToken?: boolean
+  resetPasswordExpires?: boolean
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role_id" | "first_name" | "last_name" | "email" | "password" | "notifications_enabled" | "language" | "refreshToken" | "created_at" | "updated_at" | "deleted_at", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role_id" | "first_name" | "last_name" | "email" | "password" | "notifications_enabled" | "language" | "refreshToken" | "resetPasswordToken" | "resetPasswordExpires" | "created_at" | "updated_at" | "deleted_at", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   application?: boolean | Prisma.User$applicationArgs<ExtArgs>
   comment?: boolean | Prisma.User$commentArgs<ExtArgs>
@@ -2436,6 +2586,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     notifications_enabled: boolean
     language: string
     refreshToken: string | null
+    resetPasswordToken: string | null
+    resetPasswordExpires: Date | null
     created_at: Date
     updated_at: Date
     deleted_at: Date | null
@@ -2829,6 +2981,8 @@ export interface UserFieldRefs {
   readonly notifications_enabled: Prisma.FieldRef<"User", 'Boolean'>
   readonly language: Prisma.FieldRef<"User", 'String'>
   readonly refreshToken: Prisma.FieldRef<"User", 'String'>
+  readonly resetPasswordToken: Prisma.FieldRef<"User", 'String'>
+  readonly resetPasswordExpires: Prisma.FieldRef<"User", 'DateTime'>
   readonly created_at: Prisma.FieldRef<"User", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"User", 'DateTime'>
   readonly deleted_at: Prisma.FieldRef<"User", 'DateTime'>
