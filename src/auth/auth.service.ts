@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import * as argon2 from 'argon2';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, type JwtSignOptions } from '@nestjs/jwt';
 import { User } from '../../prisma/generated/prisma/client';
 import { IPayload } from './interface';
-import { request, type Response } from 'express';
+import { type Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -27,39 +27,54 @@ export class AuthService {
       email: user.email,
     };
     const accessToken = await this.jwtService.signAsync(payload, {
-      expiresIn: process.env.ACCESS_JWT_EXPIRE as any,
-      secret: process.env.ACCESS_SECRET_KEY as any,
+      expiresIn: process.env.ACCESS_JWT_EXPIRE as JwtSignOptions['expiresIn'],
+      secret: process.env.ACCESS_SECRET_KEY,
     });
 
     const refreshToken = await this.jwtService.signAsync(payload, {
-      expiresIn: process.env.REFRESH_JWT_EXPIRE as any,
-      secret: process.env.REFRESH_SECRET_KEY as any,
+      expiresIn: process.env.REFRESH_JWT_EXPIRE as JwtSignOptions['expiresIn'],
+      secret: process.env.REFRESH_SECRET_KEY,
     });
 
     return { accessToken, refreshToken };
   }
 
   async verifyToken(token: string, type: string = 'access'): Promise<IPayload> {
-    const payload = await this.jwtService.verifyAsync(token, {
+    return this.jwtService.verifyAsync<IPayload>(token, {
       algorithms: ['HS512'],
       secret:
         type == 'access'
-          ? (process.env.ACCESS_SECRET_KEY as any)
-          : (process.env.REFRESH_SECRET_KEY as any),
+          ? process.env.ACCESS_SECRET_KEY
+          : process.env.REFRESH_SECRET_KEY,
     });
-    return payload;
   }
 
   insertTokenCookie(response: Response, refreshToken: string): void {
     response.cookie('refreshToken', refreshToken, {
-      httpOnly: process.env.PROD as any,
+      httpOnly: true,
+      secure: process.env.PROD === 'true',
       sameSite: 'strict',
       path: '/auth/refresh',
     });
   }
 
+  clearTokenCookie(response: Response): void {
+    response.clearCookie('refreshToken', {
+      path: '/auth/refresh',
+      sameSite: 'strict',
+    });
+  }
+
   extractTokenFromCookie(cookie: string): string | undefined {
-    const [key, token] = cookie?.split('=') ?? [];
-    return key === 'refreshToken' ? token : undefined;
+    const cookies = cookie.split(';').map((entry) => entry.trim());
+
+    for (const entry of cookies) {
+      const [key, ...valueParts] = entry.split('=');
+      if (key === 'refreshToken') {
+        return decodeURIComponent(valueParts.join('='));
+      }
+    }
+
+    return undefined;
   }
 }

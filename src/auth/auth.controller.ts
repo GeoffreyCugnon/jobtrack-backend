@@ -2,7 +2,6 @@ import {
   Controller,
   Post,
   Body,
-  ConflictException,
   BadRequestException,
   Res,
   Logger,
@@ -115,6 +114,18 @@ export class AuthController {
     this.authService.insertTokenCookie(response, refreshToken);
 
     return accessToken;
+  }
+
+  @Post('logout')
+  @UseGuards(AuthGuard)
+  async logout(
+    @Req() request: IRequestWithPayload,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<{ message: string }> {
+    await this.userService.update(request.user.id, { refreshToken: null });
+    this.authService.clearTokenCookie(response);
+
+    return { message: 'Déconnexion réussie' };
   }
 
   @Patch('password')
