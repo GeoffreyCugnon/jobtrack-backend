@@ -1,7 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { Prisma } from '../../prisma/generated/prisma/client';
 import { CreateJobOfferingDto } from './dto/create-job_offering.dto';
 import { UpdateJobOfferingDto } from './dto/update-job_offering.dto';
+
+/** Ligne `job_offering` telle que chargée par `findAll()`/`findOne()` (relations incluses). */
+type OfferRow = Prisma.Job_offeringGetPayload<{
+  include: { company: true; application: { select: { id: true } } };
+}>;
 
 const CATEGORY_BY_KEYWORD: Array<{ keywords: string[]; category: string }> = [
   {
@@ -133,7 +139,7 @@ export class JobOfferingService {
     return 'onSite';
   }
 
-  private toOfferDto(row: any) {
+  private toOfferDto(row: OfferRow) {
     const createdAt = new Date(row.created_at);
     const hoursAgo = Math.max(
       1,
@@ -153,24 +159,30 @@ export class JobOfferingService {
       category: this.inferCategory(row.title),
       workMode: this.inferWorkMode(row.title),
       applicantCount: row.application?.length ?? 0,
-      verified: [
-        'TechCorp',
-        'CloudNine',
-        'Hôpital Pasteur',
-        'PixelWorks',
-      ].includes(row.company?.name ?? ''),
+      verified: row.company?.verified ?? false,
     };
   }
 
-  async create(createJobOfferingDto: CreateJobOfferingDto) {
+  async create(createJobOfferingDto: CreateJobOfferingDto, userId: number) {
     const { title, description, contract_type } = createJobOfferingDto;
+
+    const employment = await this.prisma.employment.findFirst({
+      where: { user_id: userId, is_current: true },
+      select: { company_id: true },
+    });
+
+    if (!employment) {
+      throw new ForbiddenException(
+        'Aucune entreprise associée à cet utilisateur : impossible de créer une offre.',
+      );
+    }
 
     return this.prisma.job_offering.create({
       data: {
         title,
         description,
         contract_type,
-        company_id: 1,
+        company_id: employment.company_id,
       },
     });
   }

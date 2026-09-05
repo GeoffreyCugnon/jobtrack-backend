@@ -17,6 +17,7 @@ describe('JobOfferingService', () => {
               name: 'TechCorp',
               address: 'Nice, France',
               business_sector: 'IT',
+              verified: true,
             },
           },
         ]),
@@ -35,6 +36,121 @@ describe('JobOfferingService', () => {
       category: 'informatique',
       workMode: 'Hybrid',
       verified: true,
+    });
+  });
+
+  it('maps offer.verified from the company.verified column, not a name whitelist', async () => {
+    const prisma = {
+      job_offering: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: 2,
+            title: 'Serveur en salle',
+            description: '...',
+            contract_type: 'CDD',
+            created_at: new Date('2026-09-05T09:00:00Z'),
+            // "TechCorp" used to be hard-coded as verified — now it must follow the column.
+            company: {
+              id: 9,
+              name: 'TechCorp',
+              address: 'Lyon',
+              verified: false,
+            },
+          },
+          {
+            id: 3,
+            title: 'Serveur en salle',
+            description: '...',
+            contract_type: 'CDD',
+            created_at: new Date('2026-09-05T09:00:00Z'),
+            company: {
+              id: 10,
+              name: 'Bistrot Inconnu',
+              address: 'Lyon',
+              verified: true,
+            },
+          },
+        ]),
+      },
+    } as any;
+
+    const service = new JobOfferingService(prisma);
+    const result = await service.findAll();
+
+    expect(result[0].verified).toBe(false);
+    expect(result[1].verified).toBe(true);
+  });
+
+  it('defaults verified to false when the company relation is missing', async () => {
+    const prisma = {
+      job_offering: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            id: 4,
+            title: 'Poste sans entreprise liée',
+            description: '...',
+            contract_type: 'CDI',
+            created_at: new Date('2026-09-05T09:00:00Z'),
+            company: null,
+          },
+        ]),
+      },
+    } as any;
+
+    const service = new JobOfferingService(prisma);
+    const result = await service.findAll();
+
+    expect(result[0].verified).toBe(false);
+  });
+
+  it('rejects offer creation when the user has no current employment', async () => {
+    const prisma = {
+      employment: {
+        findFirst: vi.fn().mockResolvedValue(null),
+      },
+      job_offering: {
+        create: vi.fn(),
+      },
+    } as any;
+
+    const service = new JobOfferingService(prisma);
+
+    await expect(
+      service.create(
+        { title: 'Dev', description: '...', contract_type: 'CDI' as any },
+        42,
+      ),
+    ).rejects.toThrow(/entreprise/i);
+    expect(prisma.job_offering.create).not.toHaveBeenCalled();
+  });
+
+  it('creates an offer bound to the company of the user current employment', async () => {
+    const prisma = {
+      employment: {
+        findFirst: vi.fn().mockResolvedValue({ company_id: 7 }),
+      },
+      job_offering: {
+        create: vi.fn().mockResolvedValue({ id: 1, company_id: 7 }),
+      },
+    } as any;
+
+    const service = new JobOfferingService(prisma);
+    await service.create(
+      { title: 'Dev', description: '...', contract_type: 'CDI' },
+      42,
+    );
+
+    expect(prisma.employment.findFirst).toHaveBeenCalledWith({
+      where: { user_id: 42, is_current: true },
+      select: { company_id: true },
+    });
+    expect(prisma.job_offering.create).toHaveBeenCalledWith({
+      data: {
+        title: 'Dev',
+        description: '...',
+        contract_type: 'CDI',
+        company_id: 7,
+      },
     });
   });
 });

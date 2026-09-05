@@ -41,6 +41,7 @@ export type CompanyMinAggregateOutputType = {
   website: string | null
   address: string | null
   is_public: boolean | null
+  verified: boolean | null
   created_at: Date | null
   updated_at: Date | null
 }
@@ -52,6 +53,7 @@ export type CompanyMaxAggregateOutputType = {
   website: string | null
   address: string | null
   is_public: boolean | null
+  verified: boolean | null
   created_at: Date | null
   updated_at: Date | null
 }
@@ -63,6 +65,7 @@ export type CompanyCountAggregateOutputType = {
   website: number
   address: number
   is_public: number
+  verified: number
   created_at: number
   updated_at: number
   _all: number
@@ -84,6 +87,7 @@ export type CompanyMinAggregateInputType = {
   website?: true
   address?: true
   is_public?: true
+  verified?: true
   created_at?: true
   updated_at?: true
 }
@@ -95,6 +99,7 @@ export type CompanyMaxAggregateInputType = {
   website?: true
   address?: true
   is_public?: true
+  verified?: true
   created_at?: true
   updated_at?: true
 }
@@ -106,6 +111,7 @@ export type CompanyCountAggregateInputType = {
   website?: true
   address?: true
   is_public?: true
+  verified?: true
   created_at?: true
   updated_at?: true
   _all?: true
@@ -204,6 +210,7 @@ export type CompanyGroupByOutputType = {
   website: string | null
   address: string | null
   is_public: boolean
+  verified: boolean
   created_at: Date
   updated_at: Date
   _count: CompanyCountAggregateOutputType | null
@@ -238,6 +245,7 @@ export type CompanyWhereInput = {
   website?: Prisma.StringNullableFilter<"Company"> | string | null
   address?: Prisma.StringNullableFilter<"Company"> | string | null
   is_public?: Prisma.BoolFilter<"Company"> | boolean
+  verified?: Prisma.BoolFilter<"Company"> | boolean
   created_at?: Prisma.DateTimeFilter<"Company"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Company"> | Date | string
   company_follower?: Prisma.Company_followerListRelationFilter
@@ -253,6 +261,7 @@ export type CompanyOrderByWithRelationInput = {
   website?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   is_public?: Prisma.SortOrder
+  verified?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   company_follower?: Prisma.Company_followerOrderByRelationAggregateInput
@@ -272,6 +281,7 @@ export type CompanyWhereUniqueInput = Prisma.AtLeast<{
   website?: Prisma.StringNullableFilter<"Company"> | string | null
   address?: Prisma.StringNullableFilter<"Company"> | string | null
   is_public?: Prisma.BoolFilter<"Company"> | boolean
+  verified?: Prisma.BoolFilter<"Company"> | boolean
   created_at?: Prisma.DateTimeFilter<"Company"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Company"> | Date | string
   company_follower?: Prisma.Company_followerListRelationFilter
@@ -287,6 +297,7 @@ export type CompanyOrderByWithAggregationInput = {
   website?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   is_public?: Prisma.SortOrder
+  verified?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   _count?: Prisma.CompanyCountOrderByAggregateInput
@@ -306,6 +317,7 @@ export type CompanyScalarWhereWithAggregatesInput = {
   website?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
   address?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
   is_public?: Prisma.BoolWithAggregatesFilter<"Company"> | boolean
+  verified?: Prisma.BoolWithAggregatesFilter<"Company"> | boolean
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Company"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"Company"> | Date | string
 }
@@ -316,6 +328,7 @@ export type CompanyCreateInput = {
   website?: string | null
   address?: string | null
   is_public?: boolean
+  verified?: boolean
   created_at?: Date | string
   updated_at?: Date | string
   company_follower?: Prisma.Company_followerCreateNestedManyWithoutCompanyInput
@@ -331,6 +344,7 @@ export type CompanyUncheckedCreateInput = {
   website?: string | null
   address?: string | null
   is_public?: boolean
+  verified?: boolean
   created_at?: Date | string
   updated_at?: Date | string
   company_follower?: Prisma.Company_followerUncheckedCreateNestedManyWithoutCompanyInput
@@ -345,6 +359,7 @@ export type CompanyUpdateInput = {
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_public?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company_follower?: Prisma.Company_followerUpdateManyWithoutCompanyNestedInput
@@ -360,6 +375,7 @@ export type CompanyUncheckedUpdateInput = {
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_public?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company_follower?: Prisma.Company_followerUncheckedUpdateManyWithoutCompanyNestedInput
@@ -375,6 +391,7 @@ export type CompanyCreateManyInput = {
   website?: string | null
   address?: string | null
   is_public?: boolean
+  verified?: boolean
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -385,6 +402,7 @@ export type CompanyUpdateManyMutationInput = {
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_public?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -396,6 +414,7 @@ export type CompanyUncheckedUpdateManyInput = {
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_public?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -413,6 +432,7 @@ export type CompanyCountOrderByAggregateInput = {
   website?: Prisma.SortOrder
   address?: Prisma.SortOrder
   is_public?: Prisma.SortOrder
+  verified?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -428,6 +448,7 @@ export type CompanyMaxOrderByAggregateInput = {
   website?: Prisma.SortOrder
   address?: Prisma.SortOrder
   is_public?: Prisma.SortOrder
+  verified?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -439,6 +460,7 @@ export type CompanyMinOrderByAggregateInput = {
   website?: Prisma.SortOrder
   address?: Prisma.SortOrder
   is_public?: Prisma.SortOrder
+  verified?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -522,6 +544,7 @@ export type CompanyCreateWithoutCompany_followerInput = {
   website?: string | null
   address?: string | null
   is_public?: boolean
+  verified?: boolean
   created_at?: Date | string
   updated_at?: Date | string
   contact?: Prisma.ContactCreateNestedManyWithoutCompanyInput
@@ -536,6 +559,7 @@ export type CompanyUncheckedCreateWithoutCompany_followerInput = {
   website?: string | null
   address?: string | null
   is_public?: boolean
+  verified?: boolean
   created_at?: Date | string
   updated_at?: Date | string
   contact?: Prisma.ContactUncheckedCreateNestedManyWithoutCompanyInput
@@ -565,6 +589,7 @@ export type CompanyUpdateWithoutCompany_followerInput = {
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_public?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   contact?: Prisma.ContactUpdateManyWithoutCompanyNestedInput
@@ -579,6 +604,7 @@ export type CompanyUncheckedUpdateWithoutCompany_followerInput = {
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_public?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   contact?: Prisma.ContactUncheckedUpdateManyWithoutCompanyNestedInput
@@ -592,6 +618,7 @@ export type CompanyCreateWithoutContactInput = {
   website?: string | null
   address?: string | null
   is_public?: boolean
+  verified?: boolean
   created_at?: Date | string
   updated_at?: Date | string
   company_follower?: Prisma.Company_followerCreateNestedManyWithoutCompanyInput
@@ -606,6 +633,7 @@ export type CompanyUncheckedCreateWithoutContactInput = {
   website?: string | null
   address?: string | null
   is_public?: boolean
+  verified?: boolean
   created_at?: Date | string
   updated_at?: Date | string
   company_follower?: Prisma.Company_followerUncheckedCreateNestedManyWithoutCompanyInput
@@ -635,6 +663,7 @@ export type CompanyUpdateWithoutContactInput = {
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_public?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company_follower?: Prisma.Company_followerUpdateManyWithoutCompanyNestedInput
@@ -649,6 +678,7 @@ export type CompanyUncheckedUpdateWithoutContactInput = {
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_public?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company_follower?: Prisma.Company_followerUncheckedUpdateManyWithoutCompanyNestedInput
@@ -662,6 +692,7 @@ export type CompanyCreateWithoutEmploymentInput = {
   website?: string | null
   address?: string | null
   is_public?: boolean
+  verified?: boolean
   created_at?: Date | string
   updated_at?: Date | string
   company_follower?: Prisma.Company_followerCreateNestedManyWithoutCompanyInput
@@ -676,6 +707,7 @@ export type CompanyUncheckedCreateWithoutEmploymentInput = {
   website?: string | null
   address?: string | null
   is_public?: boolean
+  verified?: boolean
   created_at?: Date | string
   updated_at?: Date | string
   company_follower?: Prisma.Company_followerUncheckedCreateNestedManyWithoutCompanyInput
@@ -705,6 +737,7 @@ export type CompanyUpdateWithoutEmploymentInput = {
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_public?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company_follower?: Prisma.Company_followerUpdateManyWithoutCompanyNestedInput
@@ -719,6 +752,7 @@ export type CompanyUncheckedUpdateWithoutEmploymentInput = {
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_public?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company_follower?: Prisma.Company_followerUncheckedUpdateManyWithoutCompanyNestedInput
@@ -732,6 +766,7 @@ export type CompanyCreateWithoutJob_offeringInput = {
   website?: string | null
   address?: string | null
   is_public?: boolean
+  verified?: boolean
   created_at?: Date | string
   updated_at?: Date | string
   company_follower?: Prisma.Company_followerCreateNestedManyWithoutCompanyInput
@@ -746,6 +781,7 @@ export type CompanyUncheckedCreateWithoutJob_offeringInput = {
   website?: string | null
   address?: string | null
   is_public?: boolean
+  verified?: boolean
   created_at?: Date | string
   updated_at?: Date | string
   company_follower?: Prisma.Company_followerUncheckedCreateNestedManyWithoutCompanyInput
@@ -775,6 +811,7 @@ export type CompanyUpdateWithoutJob_offeringInput = {
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_public?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company_follower?: Prisma.Company_followerUpdateManyWithoutCompanyNestedInput
@@ -789,6 +826,7 @@ export type CompanyUncheckedUpdateWithoutJob_offeringInput = {
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_public?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company_follower?: Prisma.Company_followerUncheckedUpdateManyWithoutCompanyNestedInput
@@ -861,6 +899,7 @@ export type CompanySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   website?: boolean
   address?: boolean
   is_public?: boolean
+  verified?: boolean
   created_at?: boolean
   updated_at?: boolean
   company_follower?: boolean | Prisma.Company$company_followerArgs<ExtArgs>
@@ -879,11 +918,12 @@ export type CompanySelectScalar = {
   website?: boolean
   address?: boolean
   is_public?: boolean
+  verified?: boolean
   created_at?: boolean
   updated_at?: boolean
 }
 
-export type CompanyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "business_sector" | "website" | "address" | "is_public" | "created_at" | "updated_at", ExtArgs["result"]["company"]>
+export type CompanyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "business_sector" | "website" | "address" | "is_public" | "verified" | "created_at" | "updated_at", ExtArgs["result"]["company"]>
 export type CompanyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   company_follower?: boolean | Prisma.Company$company_followerArgs<ExtArgs>
   contact?: boolean | Prisma.Company$contactArgs<ExtArgs>
@@ -907,6 +947,7 @@ export type $CompanyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     website: string | null
     address: string | null
     is_public: boolean
+    verified: boolean
     created_at: Date
     updated_at: Date
   }, ExtArgs["result"]["company"]>
@@ -1288,6 +1329,7 @@ export interface CompanyFieldRefs {
   readonly website: Prisma.FieldRef<"Company", 'String'>
   readonly address: Prisma.FieldRef<"Company", 'String'>
   readonly is_public: Prisma.FieldRef<"Company", 'Boolean'>
+  readonly verified: Prisma.FieldRef<"Company", 'Boolean'>
   readonly created_at: Prisma.FieldRef<"Company", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"Company", 'DateTime'>
 }

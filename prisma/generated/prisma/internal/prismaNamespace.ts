@@ -1689,6 +1689,7 @@ export const CompanyScalarFieldEnum = {
   website: 'website',
   address: 'address',
   is_public: 'is_public',
+  verified: 'verified',
   created_at: 'created_at',
   updated_at: 'updated_at'
 } as const
