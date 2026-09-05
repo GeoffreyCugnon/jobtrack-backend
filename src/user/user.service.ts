@@ -1,8 +1,8 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { Prisma, User } from 'prisma/generated/prisma/client';
-import { PrismaService } from 'prisma/prisma.service';
+import { Prisma, User } from '../../prisma/generated/prisma/client';
+import { PrismaService } from '../../prisma/prisma.service';
 import { UserWithoutPass } from './interface/partielUser';
-import { RegisterDto } from 'src/auth/dto/register.dto';
+import { RegisterDto } from '../auth/dto/register.dto';
 
 @Injectable()
 export class UserService {

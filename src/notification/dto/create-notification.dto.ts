@@ -1,5 +1,5 @@
 import { IsInt, IsOptional, IsEnum, IsNotEmpty } from 'class-validator';
-import { Notification_event_type } from 'prisma/generated/prisma/enums';
+import { Notification_event_type } from '../../../prisma/generated/prisma/enums';
 
 export class CreateNotificationDto {
   @IsNotEmpty()

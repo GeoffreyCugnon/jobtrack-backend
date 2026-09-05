@@ -1,4 +1,4 @@
-import { Publication_type } from 'prisma/generated/prisma/enums';
+import { Publication_type } from '../../../prisma/generated/prisma/enums';
 
 export class Publication {
   id: number;

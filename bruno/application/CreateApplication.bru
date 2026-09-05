@@ -1,0 +1,15 @@
+meta {
+  name: "CreateApplication"
+  type: "http"
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/application
+  body: json
+  auth: none
+}
+
+body {
+  "status": "PENDING"
+}

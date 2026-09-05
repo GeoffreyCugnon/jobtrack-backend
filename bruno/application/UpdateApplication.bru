@@ -1,0 +1,15 @@
+meta {
+  name: "UpdateApplication"
+  type: "http"
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/application/1
+  body: json
+  auth: none
+}
+
+body {
+  "status": "ACCEPTED"
+}

@@ -9,9 +9,9 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { NotificationService } from './notification.service';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
-import type { IRequestWithPayload } from 'src/auth/interface';
-import { Notification } from 'prisma/generated/prisma/client';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import type { IRequestWithPayload } from '../auth/interface';
+import { Notification } from '../../prisma/generated/prisma/client';
 
 @UseGuards(AuthGuard)
 @Controller('notifications')

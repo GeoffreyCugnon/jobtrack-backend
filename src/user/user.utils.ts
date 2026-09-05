@@ -1,4 +1,4 @@
-import { User } from 'prisma/generated/prisma/client';
+import { User } from '../../prisma/generated/prisma/client';
 import { SafeUser } from './interface/partielUser';
 
 export function toSafeUser(user: User): SafeUser {

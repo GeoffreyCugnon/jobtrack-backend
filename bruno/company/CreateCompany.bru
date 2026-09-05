@@ -1,0 +1,19 @@
+meta {
+  name: "CreateCompany"
+  type: "http"
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/company
+  body: json
+  auth: none
+}
+
+body {
+  "name": "{{companyName}}",
+  "business_sector": "{{companySector}}",
+  "website": "{{companyWebsite}}",
+  "address": "{{companyAddress}}",
+  "isPublic": true
+}

@@ -1,9 +1,9 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
-import { PrismaService } from 'prisma/prisma.service';
-import { UserService } from 'src/user/user.service';
-import { Notification } from 'prisma/generated/prisma/client';
+import { PrismaService } from '../../prisma/prisma.service';
+import { UserService } from '../user/user.service';
+import { Notification } from '../../prisma/generated/prisma/client';
 
 @Injectable()
 export class NotificationService {

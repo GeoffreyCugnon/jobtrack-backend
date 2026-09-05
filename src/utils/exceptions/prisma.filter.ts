@@ -9,7 +9,7 @@ import { Response } from 'express';
 import { PrismaErrorEnum } from '../enum/prismaError';
 // Use the official Prisma client package for typings. Adjusted to avoid referencing a generated
 // client path that may not exist in some setups (pre-generated or different output dirs).
-import { Prisma } from 'prisma/generated/prisma/client';
+import { Prisma } from '../../../prisma/generated/prisma/client';
 
 /**
  * Exception filter that handles Prisma client exceptions
@@ -39,14 +39,12 @@ export class PrismaExceptionFilter implements ExceptionFilter {
    * 4. Returns a standardized error response with status code, error code, and message
    */
   catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
-    
     const context = host.switchToHttp();
     const response = context.getResponse<Response>();
     let status: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
     let errorCode: string = 'internal_server_error';
     let message: string = 'Internal server Error';
 
-    
     switch (exception.code) {
       // Handle unique constraint violations (e.g., duplicate email)
       case PrismaErrorEnum.UniqueConstraintFailed: {
@@ -79,7 +77,7 @@ export class PrismaExceptionFilter implements ExceptionFilter {
         break;
     }
 
-    Logger.error(message)
+    Logger.error(message);
 
     // Return standardized error response
     response.status(status).json({

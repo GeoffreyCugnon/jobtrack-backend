@@ -13,11 +13,11 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Prisma } from 'prisma/generated/prisma/client';
+import { Prisma } from '../../prisma/generated/prisma/client';
 import { UserWithoutPass } from './interface/partielUser';
-import { PrismaService } from 'prisma/prisma.service';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
-import type { IRequestWithPayload } from 'src/auth/interface';
+import { PrismaService } from '../../prisma/prisma.service';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import type { IRequestWithPayload } from '../auth/interface';
 import type { Request } from 'express';
 import { UpdateNotificationsDto } from './dto/update-notifications.dto';
 import { UpdateLanguageDto } from './dto/update-language.dto';

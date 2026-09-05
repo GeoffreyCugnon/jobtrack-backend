@@ -14,15 +14,15 @@ import {
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/Login.dto';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 import type { Response } from 'express';
 import type { Request } from 'express';
-import { User } from 'prisma/generated/prisma/client';
+import { User } from '../../prisma/generated/prisma/client';
 import { AuthGuard } from './guards/auth.guard';
 import { ChangePasswordDto } from './dto/changePassword.dto';
 import type { IRequestWithPayload } from './interface';
-import { SafeUser } from 'src/user/interface/partielUser';
-import { toSafeUser } from 'src/user/user.utils';
+import { SafeUser } from '../user/interface/partielUser';
+import { toSafeUser } from '../user/user.utils';
 
 @Controller('auth')
 export class AuthController {

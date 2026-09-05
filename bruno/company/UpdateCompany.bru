@@ -1,0 +1,19 @@
+meta {
+  name: "UpdateCompany"
+  type: "http"
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/company/1
+  body: json
+  auth: none
+}
+
+body {
+  "name": "Acme Updated",
+  "business_sector": "Software",
+  "website": "https://acme-updated.example",
+  "address": "Lyon",
+  "isPublic": true
+}

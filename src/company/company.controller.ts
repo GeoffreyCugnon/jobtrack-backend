@@ -1,17 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
-import { Company } from 'prisma/generated/prisma/client';
+import { Company } from '../../prisma/generated/prisma/client';
 
 @Controller('company')
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
 
   @Post()
-  async create(@Body() body: CreateCompanyDto): Promise<{data: {company: Company}; message : string}> {
+  async create(
+    @Body() body: CreateCompanyDto,
+  ): Promise<{ data: { company: Company }; message: string }> {
     const company = await this.companyService.create(body);
-    return {data: {company}, message: 'user create successfull'};
+    return { data: { company }, message: 'user create successfull' };
   }
 
   @Get()

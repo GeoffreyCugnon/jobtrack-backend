@@ -15,7 +15,7 @@ import { JobOfferingModule } from './job_offering/job_offering.module';
 import { MessageModule } from './message/message.module';
 import { NotificationModule } from './notification/notification.module';
 import { SkillModule } from './skill/skill.module';
-import { PrismaModule } from 'prisma/prisma.module';
+import { PrismaModule } from '../prisma/prisma.module';
 import { ConnectionModule } from './connection/connection.module';
 import { DocumentModule } from './document/document.module';
 import { PublicationModule } from './publication/publication.module';

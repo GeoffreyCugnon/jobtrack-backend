@@ -1,0 +1,15 @@
+meta {
+  name: "UpdateNotifications"
+  type: "http"
+  seq: 5
+}
+
+patch {
+  url: {{baseUrl}}/user/settings/notifications
+  body: json
+  auth: none
+}
+
+body {
+  "notifications_enabled": true
+}
