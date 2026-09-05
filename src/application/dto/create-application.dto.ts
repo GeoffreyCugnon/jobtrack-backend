@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty } from 'class-validator';
 import { Application_status } from '../../../prisma/generated/prisma/enums';
 
 export class CreateApplicationDto {

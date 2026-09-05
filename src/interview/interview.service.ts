@@ -4,7 +4,7 @@ import { UpdateInterviewDto } from './dto/update-interview.dto';
 
 @Injectable()
 export class InterviewService {
-  create(createInterviewDto: CreateInterviewDto) {
+  create(_createInterviewDto: CreateInterviewDto) {
     return 'This action adds a new interview';
   }
 
@@ -16,7 +16,7 @@ export class InterviewService {
     return `This action returns a #${id} interview`;
   }
 
-  update(id: number, updateInterviewDto: UpdateInterviewDto) {
+  update(id: number, _updateInterviewDto: UpdateInterviewDto) {
     return `This action updates a #${id} interview`;
   }
 

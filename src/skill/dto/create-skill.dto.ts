@@ -1,10 +1,8 @@
-import { IsNotEmpty, IsString, MaxLength } from "class-validator";
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class CreateSkillDto {
-
-    @IsNotEmpty()
-    @IsString()
-    @MaxLength(150)
-    name: string;
-
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(150)
+  name: string;
 }

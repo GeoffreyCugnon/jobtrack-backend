@@ -25,7 +25,7 @@ export class RoleService {
     return role;
   }
 
-  update(id: number, updateRoleDto: UpdateRoleDto) {
+  update(id: number, _updateRoleDto: UpdateRoleDto) {
     return `This action updates a #${id} role`;
   }
 

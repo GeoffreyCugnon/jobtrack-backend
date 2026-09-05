@@ -4,7 +4,7 @@ import { UpdateConnectionDto } from './dto/update-connection.dto';
 
 @Injectable()
 export class ConnectionService {
-  create(createConnectionDto: CreateConnectionDto) {
+  create(_createConnectionDto: CreateConnectionDto) {
     return 'This action adds a new connection';
   }
 
@@ -16,7 +16,7 @@ export class ConnectionService {
     return `This action returns a #${id} connection`;
   }
 
-  update(id: number, updateConnectionDto: UpdateConnectionDto) {
+  update(id: number, _updateConnectionDto: UpdateConnectionDto) {
     return `This action updates a #${id} connection`;
   }
 

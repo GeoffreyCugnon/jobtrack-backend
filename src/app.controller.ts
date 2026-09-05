@@ -1,5 +1,4 @@
-import { Controller, Get, Header, Req } from '@nestjs/common';
-import { Request } from 'express';
+import { Controller, Get, Header } from '@nestjs/common';
 
 @Controller()
 export class AppController {

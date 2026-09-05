@@ -48,7 +48,7 @@ export class NotificationService {
     });
   }
 
-  update(id: number, updateNotificationDto: UpdateNotificationDto) {
+  update(id: number, _updateNotificationDto: UpdateNotificationDto) {
     return `This action updates a #${id} notification`;
   }
 

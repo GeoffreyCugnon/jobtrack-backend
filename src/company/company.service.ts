@@ -25,7 +25,7 @@ export class CompanyService {
     return `This action returns a #${id} company`;
   }
 
-  update(id: number, updateCompanyDto: UpdateCompanyDto) {
+  update(id: number, _updateCompanyDto: UpdateCompanyDto) {
     return `This action updates a #${id} company`;
   }
 

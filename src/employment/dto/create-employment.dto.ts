@@ -24,5 +24,5 @@ export class CreateEmploymentDto {
 
   @IsNotEmpty()
   @IsBoolean()
-  is_current: Boolean;
+  is_current: boolean;
 }

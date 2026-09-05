@@ -12,6 +12,19 @@ import { PrismaErrorEnum } from '../enum/prismaError';
 import { Prisma } from '../../../prisma/generated/prisma/client';
 
 /**
+ * Forme minimale de l'erreur brute remontée par l'adaptateur (mariadb) et
+ * exposée par Prisma dans `meta.driverAdapterError` — non typée par Prisma.
+ */
+interface DriverAdapterError {
+  cause?: {
+    constraint?: {
+      index?: string;
+      fields?: string[];
+    };
+  };
+}
+
+/**
  * Exception filter that handles Prisma client exceptions
  *
  * This filter catches PrismaClientKnownRequestError exceptions thrown by Prisma
@@ -45,11 +58,18 @@ export class PrismaExceptionFilter implements ExceptionFilter {
     let errorCode: string = 'internal_server_error';
     let message: string = 'Internal server Error';
 
-    switch (exception.code) {
+    const rawModelName = exception.meta?.modelName;
+    const modelName =
+      typeof rawModelName === 'string' ? rawModelName : 'inconnue';
+    const driverError = exception.meta?.driverAdapterError as
+      | DriverAdapterError
+      | undefined;
+
+    switch (exception.code as PrismaErrorEnum) {
       // Handle unique constraint violations (e.g., duplicate email)
       case PrismaErrorEnum.UniqueConstraintFailed: {
         status = HttpStatus.CONFLICT;
-        message = `Conflict unicity key : ${(exception.meta?.driverAdapterError as any).cause.constraint.index} for table: ${exception.meta?.modelName}`;
+        message = `Conflict unicity key : ${driverError?.cause?.constraint?.index ?? 'inconnu'} for table: ${modelName}`;
         errorCode = 'unique constraint is violated';
         break;
       }
@@ -57,7 +77,7 @@ export class PrismaExceptionFilter implements ExceptionFilter {
       // Handle foreign key constraint failures (e.g., invalid relation)
       case PrismaErrorEnum.ForeignKeyConstraintFailed: {
         status = HttpStatus.BAD_REQUEST;
-        message = `Bad payload with table : ${exception.meta?.modelName} for col: ${(exception.meta?.driverAdapterError as any).cause.constraint.fields}`;
+        message = `Bad payload with table : ${modelName} for col: ${driverError?.cause?.constraint?.fields?.join(', ') ?? 'inconnu'}`;
         errorCode = 'foreign key constraint is violated';
         break;
       }
@@ -65,7 +85,7 @@ export class PrismaExceptionFilter implements ExceptionFilter {
       // Handle record not found errors
       case PrismaErrorEnum.RecordDoesNotExist: {
         status = HttpStatus.NOT_FOUND;
-        message = `record not found for table ${exception.meta?.modelName}`;
+        message = `record not found for table ${modelName}`;
         errorCode = 'record does not exist in the database';
         break;
       }

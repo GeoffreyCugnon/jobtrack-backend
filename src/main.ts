@@ -7,7 +7,10 @@ import { HttpExceptionFilter } from './utils/exceptions/http.filter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: (origin, callback) => {
+    origin: (
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void,
+    ) => {
       const localOriginPattern = /^https?:\/\/(localhost|127\.0\.0\.1):\d+$/;
 
       if (!origin || localOriginPattern.test(origin)) {
@@ -26,4 +29,4 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter(), new PrismaExceptionFilter());
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+void bootstrap();
