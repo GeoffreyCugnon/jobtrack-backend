@@ -5,7 +5,7 @@ API du CRM de recherche d'emploi JobTrack. Repo Git **séparé** du frontend (`.
 ## Stack
 
 - NestJS 11, TypeScript
-- Prisma 7.8 — datasource MySQL (`schema.prisma`), adaptateur `@prisma/adapter-mariadb`
+- Prisma 7.8 — datasource MySQL (`schema.prisma`), adaptateur `@prisma/adapter-mariadb`. `prisma.service.ts` ajoute `allowPublicKeyRetrieval=true` à `DATABASE_URL` avant de le passer à l'adaptateur : le serveur MySQL authentifie en `caching_sha2_password` sans TLS, sans ce flag le pool part en timeout (`pool timeout ... active=0 idle=0`). Ne pas retirer (ou alors passer le serveur en TLS / `mysql_native_password`).
 - Auth JWT maison : `@nestjs/jwt` + `passport`/`passport-jwt` en dépendance mais garde custom (voir plus bas), hash des mots de passe avec **argon2** (bcrypt a été retiré)
 - class-validator / class-transformer pour la validation des DTO — `ValidationPipe` global en mode strict (`whitelist: true, forbidNonWhitelisted: true`) : tout champ non déclaré dans un DTO fait échouer la requête, donc les DTO doivent être exhaustifs
 - **Vitest** pour les tests (migré depuis Jest) : `test`, `test:watch`, `test:cov`, `test:e2e` passent tous par `vitest`
