@@ -6,7 +6,7 @@ API du CRM de recherche d'emploi JobTrack. Repo Git **séparé** du frontend (`.
 
 - NestJS 11, TypeScript
 - Prisma 7.8 — datasource MySQL (`schema.prisma`), adaptateur `@prisma/adapter-mariadb`. `prisma.service.ts` ajoute `allowPublicKeyRetrieval=true` à `DATABASE_URL` avant de le passer à l'adaptateur : le serveur MySQL authentifie en `caching_sha2_password` sans TLS, sans ce flag le pool part en timeout (`pool timeout ... active=0 idle=0`). Ne pas retirer (ou alors passer le serveur en TLS / `mysql_native_password`).
-- Auth JWT maison : `@nestjs/jwt` + `passport`/`passport-jwt` en dépendance mais garde custom (voir plus bas), hash des mots de passe avec **argon2** (bcrypt a été retiré)
+- Auth JWT maison : `@nestjs/jwt` + garde custom (`AuthGuard`, voir plus bas). `passport`/`passport-jwt` ont été retirés (audit v3) — jamais utilisés. Hash des mots de passe avec **argon2** (bcrypt a été retiré)
 - class-validator / class-transformer pour la validation des DTO — `ValidationPipe` global en mode strict (`whitelist: true, forbidNonWhitelisted: true`) : tout champ non déclaré dans un DTO fait échouer la requête, donc les DTO doivent être exhaustifs
 - **Vitest** pour les tests (migré depuis Jest) : `test`, `test:watch`, `test:cov`, `test:e2e` passent tous par `vitest`
 - ESLint + Prettier
@@ -16,9 +16,10 @@ API du CRM de recherche d'emploi JobTrack. Repo Git **séparé** du frontend (`.
 
 Le point critique de l'audit v2 (quasi-absence de `@UseGuards(AuthGuard)`) est **traité** :
 
-- `@UseGuards(AuthGuard)` est posé **au niveau classe** sur tous les contrôleurs qui en manquaient : `application`, `comment`, `company`, `connection`, `contact`, `document`, `employment`, `interview`, `message`, `publication`, `role`, `skill`.
+- `@UseGuards(AuthGuard)` est posé **au niveau classe** sur tous les contrôleurs restants (`company`, `notification`, `publication`, `role`, `user`). Les contrôleurs scaffold non protégés à l'origine ont depuis été supprimés (audit v3).
 - `job_offering` : `create` était déjà protégé ; `update` et `remove` le sont maintenant aussi (guard au niveau méthode). `findAll`/`findOne` restent **publics volontairement** (parcours des offres côté Frontend guest).
-- `user.controller.ts` : au-delà de l'authentification (guard classe déjà présent), une **vérification de propriété** minimale a été ajoutée — `_assertSelf(id, request)` sur `PUT /user/:id` et `DELETE /user/:id` : un utilisateur ne peut agir que sur son propre compte (`ForbiddenException` sinon). La route `DELETE /user` (`deleteAll`, suppression de **tous** les comptes) et la méthode `UserService.deleteAll()` — qui plantait de toute façon sur `ALTER TABLE Candidate/Recruiter`, tables disparues du schéma — ont été **supprimées**.
+- `user.controller.ts` : `_assertSelf(id, request)` sur `PUT /user/:id` et `DELETE /user/:id` (un utilisateur ne peut agir que sur son propre compte). `DELETE /user` (`deleteAll`) supprimé.
+- **🔴🔴 Fuite corrigée (audit v3).** `UserService.findOneOrThrow` renvoyait la ligne `User` complète (hash `password`, `refreshToken`, `resetPasswordToken`, `resetPasswordExpires`) — exposée par `GET /user/:id` et `GET /user/profil` à tout utilisateur connecté. Désormais : `SAFE_USER_OMIT` (`user.utils.ts`, `omit` Prisma appliqué au **runtime**) sur `findAll`/`update` + `findOneSafeOrThrow` pour les routes ; `findOneOrThrow` (complet) réservé à `auth` (comparaison mot de passe / refresh token). Toute nouvelle route qui renvoie un `User` doit passer par une méthode « safe » ou `toSafeUser()` — le type `SafeUser` seul ne filtre rien.
 
 Reste ouvert (non bloquant, à faire quand le besoin apparaît) : il n'y a toujours pas de `RolesGuard` basé sur le modèle `Role` (pas de rôle admin). Le contrôle d'accès « ressource appartenant à un utilisateur précis » n'est fait que sur `user` ; les autres modules se contentent pour l'instant de l'authentification (tout utilisateur connecté peut voir/modifier les ressources des autres modules). À renforcer par une vérification de propriété si ces modules portent des données par-utilisateur en production.
 
@@ -28,7 +29,7 @@ Reste ouvert (non bloquant, à faire quand le besoin apparaît) : il n'y a toujo
 
 Modèles : `User`, `User_skill`, `Skill`, `Company`, `Company_follower`, `Contact`, `Employment`, `Job_offering`, `Application`, `Application_document`, `Document`, `Interview`, `Message`, `Comment`, `Publication`, `Connection`, `Notification`, `Role`. Le modèle `event` a été supprimé (le module `events` correspondant aussi — voir plus bas).
 
-Les fichiers `*.entities.ts` générés par `nest generate resource` restent quasi vides et **ne sont pas utilisés** : les services utilisent directement les types générés par Prisma (`../../prisma/generated/prisma/client`). Pas la peine de les étoffer.
+Les dossiers `entities/` générés par `nest g resource` ont été **supprimés** (audit v3) : les services utilisent directement les types Prisma générés (`../../prisma/generated/prisma/client`). Ne pas recréer de `*.entity.ts`.
 
 ## Module Auth
 
@@ -46,7 +47,7 @@ Les fichiers `*.entities.ts` générés par `nest generate resource` restent qua
 
 Points d'attention :
 - Le cookie de refresh token est parsé **manuellement** depuis `request.headers.cookie` (`extractTokenFromCookie`) — il n'y a pas de middleware `cookie-parser` installé. Ne pas ajouter `request.cookies` en supposant qu'il existe sans avoir vérifié.
-- `AuthGuard` est une garde maison (extraction du header `Authorization: Bearer`), pas la stratégie Passport standard, même si `passport`/`passport-jwt` sont en dépendance.
+- `AuthGuard` est une garde maison (extraction du header `Authorization: Bearer`), pas la stratégie Passport standard (Passport n'est plus une dépendance).
 - Secrets et durées de vie des tokens attendus en env : `ACCESS_SECRET_KEY`, `ACCESS_JWT_EXPIRE`, `REFRESH_SECRET_KEY`, `REFRESH_JWT_EXPIRE`, plus `PROD` (conditionne `httpOnly`), `PORT` et `FRONTEND_URL` (utilisé pour construire le lien de reset password, fallback `http://localhost:5173`). Ne jamais afficher ni committer les valeurs réelles (`.env`).
 - Les DTO de `auth/dto/` sont tous en kebab-case (`login.dto.ts`, `change-password.dto.ts`, `forgot-password.dto.ts`, `reset-password.dto.ts`, `register.dto.ts`, `update-auth.dto.ts`) — l'incohérence de nommage relevée par l'audit v2 a été corrigée.
 
@@ -66,7 +67,9 @@ Réutiliser ces filtres plutôt que du `try/catch` ad hoc dans les services pour
 
 ## Organisation des modules
 
-Modules renommés au singulier lors d'un audit précédent (`applications` → `application`, `jobs` → `job_offering`, `competences` → `skill`, etc.). Liste actuelle : `application`, `auth`, `comment`, `company`, `connection`, `contact`, `document`, `employment`, `interview`, `job_offering`, `message`, `notification`, `publication`, `role`, `skill`, `user`, plus `utils/` (filtres d'exception, enum Prisma partagés). Le module `events` a été supprimé — ne pas le recréer sans vérifier d'abord si c'est intentionnel.
+Modules renommés au singulier lors d'un audit précédent (`applications` → `application`, `jobs` → `job_offering`, etc.). **Liste actuelle (après audit v3)** : `auth`, `company`, `job_offering`, `notification`, `publication`, `role`, `user`, plus `utils/` (filtres d'exception, enum Prisma partagés).
+
+Retirés d'`AppModule` et supprimés à l'audit v3 car encore au stade scaffold (`"This action returns all …"` renvoyé en 200) : `application`, `comment`, `connection`, `contact`, `document`, `employment`, `interview`, `message`, `skill`. Les régénérer avec `nest g resource <nom>` **au moment de les implémenter**, puis les remonter dans `app.module.ts`. Le module `events` avait déjà été supprimé plus tôt.
 
 ## Module `job_offering` — logique métier implémentée
 
@@ -81,9 +84,9 @@ Ce module a son test unitaire, `job_offering.service.spec.ts` : instancie le ser
 
 ## État d'avancement
 
-Logique substantielle déjà écrite : `auth`, `user`, `company` (partiellement, voir ci-dessous), `notification`, `role`, `job_offering`. Les DTO de création (`create-*.dto.ts`) portent de vraies règles class-validator sur la plupart des modules. En revanche, les services de `application`, `comment`, `connection`, `contact`, `document`, `employment`, `interview`, `message`, `publication`, `skill` restent proches du scaffold `nest generate resource` — CRUD minimal, peu de règles métier. Leurs contrôleurs sont désormais protégés par `@UseGuards(AuthGuard)` au niveau classe (authentification requise), mais **sans vérification de propriété** : ne pas supposer qu'un endpoint gère les cas particuliers (autorisation fine, cascades, validations croisées) sans avoir lu le service correspondant.
+Modules réellement câblés (après audit v3, les scaffolds ont été supprimés) : `auth`, `user`, `company`, `notification`, `role`, `job_offering`, `publication`. Tous les contrôleurs sont protégés par `@UseGuards(AuthGuard)` au niveau classe, mais **sans vérification de propriété** hors `user` (`_assertSelf`) et `notification` (`target_user_id`) : ne pas supposer qu'un endpoint gère l'autorisation fine sans avoir lu le service.
 
-`company.service.ts` : seule `create()` est implémentée (avec vérification d'unicité du nom) ; `findAll`, `findOne`, `update`, `remove` ne sont que des chaînes de texte factices (`` `This action returns all company` ``, etc.) — non fonctionnels. Le contrôleur est protégé par `AuthGuard` au niveau classe.
+`company.service.ts` : CRUD Prisma complet depuis l'audit v3 (`create` garde la vérification d'unicité du nom). `create-company.dto` : le champ est `is_public` (et non `isPublic`, qui échouait à l'insert Prisma).
 
 ## Sécurité
 
