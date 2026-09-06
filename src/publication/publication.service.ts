@@ -36,6 +36,7 @@ export class PublicationService {
 
     return {
       id: row.id,
+      authorId: row.user_id,
       authorName:
         `${row.user?.first_name ?? ''} ${row.user?.last_name ?? ''}`.trim() ||
         'Utilisateur',
