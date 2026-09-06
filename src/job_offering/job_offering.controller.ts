@@ -42,6 +42,7 @@ export class JobOfferingController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard)
   update(
     @Param('id') id: string,
     @Body() updateJobOfferingDto: UpdateJobOfferingDto,
@@ -50,6 +51,7 @@ export class JobOfferingController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
   remove(@Param('id') id: string) {
     return this.jobOfferingService.remove(+id);
   }

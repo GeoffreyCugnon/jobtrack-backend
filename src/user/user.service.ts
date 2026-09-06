@@ -54,13 +54,4 @@ export class UserService {
     await this.findOneOrThrow(id);
     return this.prisma.user.delete({ where: { id } });
   }
-
-  async deleteAll(): Promise<Prisma.BatchPayload> {
-    const result = await this.prisma.user.deleteMany();
-    await this.prisma.$executeRaw`ALTER TABLE User AUTO_INCREMENT = 1`;
-    await this.prisma.$executeRaw`ALTER TABLE Candidate AUTO_INCREMENT = 1`;
-    await this.prisma.$executeRaw`ALTER TABLE Recruiter AUTO_INCREMENT = 1`;
-
-    return result;
-  }
 }

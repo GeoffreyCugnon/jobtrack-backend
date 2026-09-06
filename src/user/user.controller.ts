@@ -10,10 +10,10 @@ import {
   Req,
   Patch,
   HttpCode,
+  ForbiddenException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Prisma } from '../../prisma/generated/prisma/client';
 import { UserWithoutPass } from './interface/partielUser';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuthGuard } from '../auth/guards/auth.guard';
@@ -53,7 +53,9 @@ export class UserController {
   async updateUser(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateUserDto,
+    @Req() request: IRequestWithPayload,
   ): Promise<UserWithoutPass> {
+    this._assertSelf(id, request);
     return await this.userService.update(id, body);
   }
 
@@ -82,7 +84,9 @@ export class UserController {
   @Delete(':id')
   async deleteUser(
     @Param('id', ParseIntPipe) id: number,
+    @Req() request: IRequestWithPayload,
   ): Promise<{ data: null; message: string }> {
+    this._assertSelf(id, request);
     await this.userService.delete(id);
     return {
       data: null,
@@ -90,8 +94,15 @@ export class UserController {
     };
   }
 
-  @Delete()
-  async deleteAll(): Promise<Prisma.BatchPayload> {
-    return this.userService.deleteAll();
+  /**
+   * Autorisation minimale : tant qu'aucun `RolesGuard` (modèle `Role`) n'est
+   * branché, un utilisateur ne peut agir que sur son propre compte.
+   */
+  private _assertSelf(id: number, request: IRequestWithPayload): void {
+    if (id !== request.user.id) {
+      throw new ForbiddenException(
+        'Vous ne pouvez agir que sur votre propre compte.',
+      );
+    }
   }
 }
