@@ -1855,6 +1855,7 @@ export const UserScalarFieldEnum = {
   last_name: 'last_name',
   email: 'email',
   password: 'password',
+  avatar_url: 'avatar_url',
   notifications_enabled: 'notifications_enabled',
   language: 'language',
   refreshToken: 'refreshToken',
@@ -1986,6 +1987,7 @@ export const UserOrderByRelevanceFieldEnum = {
   last_name: 'last_name',
   email: 'email',
   password: 'password',
+  avatar_url: 'avatar_url',
   language: 'language',
   refreshToken: 'refreshToken',
   resetPasswordToken: 'resetPasswordToken'

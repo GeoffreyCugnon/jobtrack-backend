@@ -3,6 +3,7 @@ import { Prisma, User } from '../../prisma/generated/prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UserWithoutPass } from './interface/partielUser';
 import { RegisterDto } from '../auth/dto/register.dto';
+import { generateAvatarUrl } from './user.utils';
 
 @Injectable()
 export class UserService {
@@ -13,6 +14,7 @@ export class UserService {
       return await this.prisma.user.create({
         data: {
           ...dto,
+          avatar_url: generateAvatarUrl(),
         },
       });
     } catch {
