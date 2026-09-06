@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module';
 
 import { ConfigModule } from '@nestjs/config';
 import { CompanyModule } from './company/company.module';
+import { ConnectionModule } from './connection/connection.module';
 import { JobOfferingModule } from './job_offering/job_offering.module';
 import { NotificationModule } from './notification/notification.module';
 import { PrismaModule } from '../prisma/prisma.module';
@@ -14,11 +15,11 @@ import { AuthModule } from './auth/auth.module';
 
 /**
  * Seuls les modules réellement implémentés sont montés. Les modules encore au
- * stade du scaffold `nest g resource` (application, comment, connection,
- * contact, document, employment, interview, message, skill) ont été retirés :
- * leurs endpoints renvoyaient des chaînes factices (« This action returns all
- * … ») en 200. Les régénérer avec `nest g resource <nom>` au moment de les
- * implémenter, puis les rajouter ici.
+ * stade du scaffold `nest g resource` (application, comment, contact, document,
+ * employment, interview, message, skill) ont été retirés : leurs endpoints
+ * renvoyaient des chaînes factices (« This action returns all … ») en 200. Les
+ * régénérer avec `nest g resource <nom>` au moment de les implémenter, puis les
+ * rajouter ici.
  */
 @Module({
   controllers: [AppController],
@@ -28,6 +29,7 @@ import { AuthModule } from './auth/auth.module';
     PrismaModule,
     UserModule,
     CompanyModule,
+    ConnectionModule,
     JobOfferingModule,
     NotificationModule,
     PublicationModule,

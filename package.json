@@ -14,6 +14,7 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "prisma:seed": "node prisma/seed.js",
+    "prisma:seed:connections": "node prisma/seed-connections.js",
     "postinstall": "prisma generate",
     "test": "vitest run",
     "test:watch": "vitest",
