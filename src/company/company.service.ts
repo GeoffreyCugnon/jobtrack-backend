@@ -17,19 +17,19 @@ export class CompanyService {
     return this.prisma.company.create({ data: dto });
   }
 
-  findAll() {
-    return `This action returns all company`;
+  findAll(): Promise<Company[]> {
+    return this.prisma.company.findMany({ orderBy: { name: 'asc' } });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} company`;
+  findOne(id: number): Promise<Company> {
+    return this.prisma.company.findUniqueOrThrow({ where: { id } });
   }
 
-  update(id: number, _updateCompanyDto: UpdateCompanyDto) {
-    return `This action updates a #${id} company`;
+  update(id: number, dto: UpdateCompanyDto): Promise<Company> {
+    return this.prisma.company.update({ where: { id }, data: dto });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} company`;
+  remove(id: number): Promise<Company> {
+    return this.prisma.company.delete({ where: { id } });
   }
 }

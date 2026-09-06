@@ -28,7 +28,7 @@ export class CreateCompanyDto {
   @IsString()
   address?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
-  isPublic: boolean;
+  is_public?: boolean;
 }

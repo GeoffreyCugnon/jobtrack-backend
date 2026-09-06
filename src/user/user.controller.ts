@@ -14,11 +14,9 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserWithoutPass } from './interface/partielUser';
-import { PrismaService } from '../../prisma/prisma.service';
+import { SafeUser } from './interface/safe-user';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import type { IRequestWithPayload } from '../auth/interface';
-import type { Request } from 'express';
 import { UpdateNotificationsDto } from './dto/update-notifications.dto';
 import { UpdateLanguageDto } from './dto/update-language.dto';
 import { UpdateAvatarDto } from './dto/update-avatar.dto';
@@ -26,27 +24,20 @@ import { UpdateAvatarDto } from './dto/update-avatar.dto';
 @UseGuards(AuthGuard)
 @Controller('user')
 export class UserController {
-  constructor(
-    private readonly userService: UserService,
-    private readonly prismaService: PrismaService,
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
   @Get('profil')
-  async getMyProfil(
-    @Req() request: IRequestWithPayload,
-  ): Promise<UserWithoutPass> {
-    return await this.userService.findOneOrThrow(request.user.id);
+  async getMyProfil(@Req() request: IRequestWithPayload): Promise<SafeUser> {
+    return await this.userService.findOneSafeOrThrow(request.user.id);
   }
 
   @Get(':id')
-  async findOne(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<UserWithoutPass> {
-    return this.userService.findOneOrThrow(id);
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<SafeUser> {
+    return this.userService.findOneSafeOrThrow(id);
   }
 
   @Get()
-  async findAll(): Promise<UserWithoutPass[]> {
+  async findAll(): Promise<SafeUser[]> {
     return await this.userService.findAll();
   }
 
@@ -55,7 +46,7 @@ export class UserController {
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateUserDto,
     @Req() request: IRequestWithPayload,
-  ): Promise<UserWithoutPass> {
+  ): Promise<SafeUser> {
     this._assertSelf(id, request);
     return await this.userService.update(id, body);
   }
@@ -64,7 +55,7 @@ export class UserController {
   async updateNotifications(
     @Req() request: IRequestWithPayload,
     @Body() body: UpdateNotificationsDto,
-  ): Promise<UserWithoutPass> {
+  ): Promise<SafeUser> {
     return await this.userService.update(request.user.id, body);
   }
 
@@ -72,7 +63,7 @@ export class UserController {
   async updateLanguage(
     @Req() request: IRequestWithPayload,
     @Body() body: UpdateLanguageDto,
-  ): Promise<UserWithoutPass> {
+  ): Promise<SafeUser> {
     return await this.userService.update(request.user.id, body);
   }
 
@@ -80,7 +71,7 @@ export class UserController {
   async updateAvatar(
     @Req() request: IRequestWithPayload,
     @Body() body: UpdateAvatarDto,
-  ): Promise<UserWithoutPass> {
+  ): Promise<SafeUser> {
     return await this.userService.update(request.user.id, {
       avatar_url: body.avatarUrl,
     });

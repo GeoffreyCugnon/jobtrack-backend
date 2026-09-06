@@ -37,7 +37,10 @@ export class NotificationController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.notificationService.remove(+id);
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() request: IRequestWithPayload,
+  ): Promise<Notification> {
+    return this.notificationService.remove(id, request.user.id);
   }
 }

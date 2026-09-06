@@ -23,7 +23,7 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import type { IRequestWithPayload } from './interface';
-import { SafeUser } from '../user/interface/partielUser';
+import { SafeUser } from '../user/interface/safe-user';
 import { toSafeUser } from '../user/user.utils';
 
 @Controller('auth')

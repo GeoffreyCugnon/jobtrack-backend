@@ -1,9 +1,9 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { Prisma, User } from '../../prisma/generated/prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
-import { UserWithoutPass } from './interface/partielUser';
+import { SafeUser } from './interface/safe-user';
 import { RegisterDto } from '../auth/dto/register.dto';
-import { generateAvatarUrl } from './user.utils';
+import { generateAvatarUrl, SAFE_USER_OMIT } from './user.utils';
 
 @Injectable()
 export class UserService {
@@ -25,22 +25,33 @@ export class UserService {
     return await this.prisma.user.count({ where: { email } });
   }
 
+  /**
+   * Renvoie la ligne `User` COMPLÈTE (hash + jetons compris). Réservé aux
+   * usages internes qui en ont besoin : `auth` (comparaison du mot de passe,
+   * du refresh token). Ne jamais renvoyer ce résultat tel quel dans une
+   * réponse HTTP — utiliser `findOneSafeOrThrow`.
+   */
   async findOneOrThrow(id: number): Promise<User> {
     return await this.prisma.user.findUniqueOrThrow({ where: { id } });
   }
 
-  async findAll(): Promise<UserWithoutPass[]> {
-    return this.prisma.user.findMany({ omit: { password: true } });
+  /** Variante « safe » de `findOneOrThrow` : sans hash ni jetons. */
+  async findOneSafeOrThrow(id: number): Promise<SafeUser> {
+    return this.prisma.user.findUniqueOrThrow({
+      where: { id },
+      omit: SAFE_USER_OMIT,
+    });
+  }
+
+  async findAll(): Promise<SafeUser[]> {
+    return this.prisma.user.findMany({ omit: SAFE_USER_OMIT });
   }
 
   async findByEmailOrThrow(email: string): Promise<User> {
     return this.prisma.user.findUniqueOrThrow({ where: { email } });
   }
 
-  async update(
-    id: number,
-    data: Prisma.UserUpdateInput,
-  ): Promise<UserWithoutPass> {
+  async update(id: number, data: Prisma.UserUpdateInput): Promise<SafeUser> {
     await this.findOneOrThrow(id);
 
     return this.prisma.user.update({
@@ -48,7 +59,7 @@ export class UserService {
       data: {
         ...data,
       },
-      omit: { password: true },
+      omit: SAFE_USER_OMIT,
     });
   }
 

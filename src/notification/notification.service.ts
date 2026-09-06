@@ -1,6 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateNotificationDto } from './dto/create-notification.dto';
-import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UserService } from '../user/user.service';
 import { Notification } from '../../prisma/generated/prisma/client';
@@ -48,11 +47,13 @@ export class NotificationService {
     });
   }
 
-  update(id: number, _updateNotificationDto: UpdateNotificationDto) {
-    return `This action updates a #${id} notification`;
-  }
+  async remove(id: number, userId: number): Promise<Notification> {
+    const notification = await this.findOneOrThrow(id);
 
-  remove(id: number) {
-    return `This action removes a #${id} notification`;
+    if (notification.target_user_id !== userId) {
+      throw new ForbiddenException();
+    }
+
+    return this.prismaService.notification.delete({ where: { id } });
   }
 }
