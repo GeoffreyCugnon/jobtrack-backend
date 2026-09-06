@@ -67,9 +67,20 @@ Réutiliser ces filtres plutôt que du `try/catch` ad hoc dans les services pour
 
 ## Organisation des modules
 
-Modules renommés au singulier lors d'un audit précédent (`applications` → `application`, `jobs` → `job_offering`, etc.). **Liste actuelle (après audit v3)** : `auth`, `company`, `job_offering`, `notification`, `publication`, `role`, `user`, plus `utils/` (filtres d'exception, enum Prisma partagés).
+Modules renommés au singulier lors d'un audit précédent (`applications` → `application`, `jobs` → `job_offering`, etc.). **Liste actuelle** : `auth`, `company`, `connection`, `job_offering`, `notification`, `publication`, `role`, `user`, plus `utils/` (filtres d'exception, enum Prisma partagés).
 
-Retirés d'`AppModule` et supprimés à l'audit v3 car encore au stade scaffold (`"This action returns all …"` renvoyé en 200) : `application`, `comment`, `connection`, `contact`, `document`, `employment`, `interview`, `message`, `skill`. Les régénérer avec `nest g resource <nom>` **au moment de les implémenter**, puis les remonter dans `app.module.ts`. Le module `events` avait déjà été supprimé plus tôt.
+Encore retirés d'`AppModule` (stade scaffold, `"This action returns all …"`) : `application`, `comment`, `contact`, `document`, `employment`, `interview`, `message`, `skill`. Les régénérer avec `nest g resource <nom>` **au moment de les implémenter**, puis les remonter dans `app.module.ts`. `connection` a été recréé (voir ci-dessous). Le module `events` avait été supprimé plus tôt.
+
+### Module `connection` — mise en relation entre membres
+
+`Connection` : PK composite `[user_action_id, user_receiver_id]` (demandeur → destinataire), statut `PENDING`/`ACCEPTED`/`REJECTED`. Toutes les routes sous `AuthGuard`.
+
+- `POST /connection` `{ userId }` → crée une invitation `PENDING`. Refuse self-connect et doublon (peu importe le sens).
+- `GET /connection` → `{ connections, incoming, outgoing }` ; chaque entrée porte l'autre utilisateur en **SafeUser** (`select` explicite `id/first_name/last_name/email/avatar_url`) + `since`.
+- `PATCH /connection/:userId/accept` → passe à `ACCEPTED` l'invitation où je suis destinataire (`updateMany`, 404 si aucune).
+- `DELETE /connection/:userId` → `deleteMany` sur la paire : refuser une invitation reçue, annuler une envoyée, ou retirer une relation.
+
+Seed : `prisma/seed-connections.js` (`npm run prisma:seed:connections`, `ADMIN_EMAIL` défaut `admin@jobtrack.local`) — 3 relations acceptées + 2 invitations en attente depuis les utilisateurs de démo. Idempotent (purge d'abord les lignes de l'admin).
 
 ## Module `job_offering` — logique métier implémentée
 
