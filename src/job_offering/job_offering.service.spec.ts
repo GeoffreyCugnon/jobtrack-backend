@@ -31,6 +31,8 @@ describe('JobOfferingService', () => {
     expect(result[0]).toMatchObject({
       id: 1,
       role: 'Développeuse Fullstack',
+      description: '...',
+      contractType: 'CDI',
       company: 'TechCorp',
       location: 'Nice, France',
       category: 'informatique',

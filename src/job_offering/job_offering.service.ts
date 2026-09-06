@@ -152,6 +152,8 @@ export class JobOfferingService {
     return {
       id: row.id,
       role: row.title,
+      description: row.description,
+      contractType: row.contract_type,
       company: row.company?.name ?? 'Entreprise',
       location: row.company?.address ?? 'France',
       timeAgo: `Il y a ${hoursAgo}h`,
