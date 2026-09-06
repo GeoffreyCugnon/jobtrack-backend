@@ -1,6 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from './generated/prisma/client';
 
+/**
+ * Le serveur MySQL utilise l'auth `caching_sha2_password` sans TLS : sans ce
+ * flag, le driver mariadb refuse de récupérer la clé publique RSA et aucune
+ * connexion n'aboutit (`pool timeout ... active=0 idle=0`).
+ * Compromis dev/LAN connu (un MITM pourrait substituer la clé) ; en prod,
+ * préférer TLS ou `mysql_native_password`.
+ */
+function withPublicKeyRetrieval(url: string): string {
+  if (!url || url.includes('allowPublicKeyRetrieval')) return url;
+  return url + (url.includes('?') ? '&' : '?') + 'allowPublicKeyRetrieval=true';
+}
+
 @Injectable()
 export class PrismaService extends PrismaClient {
   constructor() {
@@ -11,7 +23,9 @@ export class PrismaService extends PrismaClient {
       // exports change or are not available at runtime.
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const { PrismaMariaDb } = require('@prisma/adapter-mariadb');
-      const adapter = new PrismaMariaDb(process.env.DATABASE_URL as string);
+      const adapter = new PrismaMariaDb(
+        withPublicKeyRetrieval(process.env.DATABASE_URL as string),
+      );
       // Pass adapter to PrismaClient options
       // @ts-ignore - adapter typing may differ between versions
       super({ adapter });
