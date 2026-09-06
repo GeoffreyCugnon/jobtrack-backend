@@ -21,6 +21,7 @@ import type { IRequestWithPayload } from '../auth/interface';
 import type { Request } from 'express';
 import { UpdateNotificationsDto } from './dto/update-notifications.dto';
 import { UpdateLanguageDto } from './dto/update-language.dto';
+import { UpdateAvatarDto } from './dto/update-avatar.dto';
 
 @UseGuards(AuthGuard)
 @Controller('user')
@@ -73,6 +74,16 @@ export class UserController {
     @Body() body: UpdateLanguageDto,
   ): Promise<UserWithoutPass> {
     return await this.userService.update(request.user.id, body);
+  }
+
+  @Patch('avatar')
+  async updateAvatar(
+    @Req() request: IRequestWithPayload,
+    @Body() body: UpdateAvatarDto,
+  ): Promise<UserWithoutPass> {
+    return await this.userService.update(request.user.id, {
+      avatar_url: body.avatarUrl,
+    });
   }
 
   @Delete('account')

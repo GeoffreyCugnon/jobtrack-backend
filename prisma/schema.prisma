@@ -240,7 +240,7 @@ model User {
   last_name                                    String             @db.VarChar(100)
   email                                        String             @unique(map: "email") @db.VarChar(255)
   password                                     String             @db.VarChar(255)
-  avatar_url                                   String?            @db.VarChar(255)
+  avatar_url                                   String?            @db.Text
   notifications_enabled                        Boolean            @default(true)
   language                                     String             @default("fr")
   refreshToken                                 String?            @db.LongText
