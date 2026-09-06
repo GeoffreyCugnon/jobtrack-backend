@@ -182,8 +182,6 @@ async function main() {
     user: url.username,
     password: url.password,
     database: url.pathname.replace(/^\//, ''),
-    // Auth caching_sha2_password sans TLS (cf. prisma.service.ts).
-    allowPublicKeyRetrieval: true,
   });
 
   for (const company of companies) {
