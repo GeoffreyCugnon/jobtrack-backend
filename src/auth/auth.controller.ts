@@ -13,15 +13,15 @@ import {
 import { randomBytes } from 'node:crypto';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/Login.dto';
+import { LoginDto } from './dto/login.dto';
 import { UserService } from '../user/user.service';
 import type { Response } from 'express';
 import type { Request } from 'express';
 import { User } from '../../prisma/generated/prisma/client';
 import { AuthGuard } from './guards/auth.guard';
-import { ChangePasswordDto } from './dto/changePassword.dto';
-import { ForgotPasswordDto } from './dto/forgotPassword.dto';
-import { ResetPasswordDto } from './dto/resetPassword.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import type { IRequestWithPayload } from './interface';
 import { SafeUser } from '../user/interface/partielUser';
 import { toSafeUser } from '../user/user.utils';
@@ -70,8 +70,6 @@ export class AuthController {
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ): Promise<{ accessToken: string; user: SafeUser }> {
-    console.log('Req.headers.cookie', request.headers.cookie);
-
     try {
       if (!request.headers.cookie) throw new Error('No Cookie');
 
