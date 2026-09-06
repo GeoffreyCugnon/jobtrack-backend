@@ -17,13 +17,14 @@ export const SAFE_USER_OMIT = {
 } as const;
 
 /**
- * Avatar par défaut d'un nouvel utilisateur : image générée à la volée par
- * DiceBear (service public, pas de clé) à partir d'un seed aléatoire — stocké
- * tel quel en base (`User.avatar_url`).
+ * Photo de profil par défaut d'un nouvel utilisateur : portrait réaliste servi
+ * par randomuser.me (CDN public, pas de clé), choisi aléatoirement parmi un
+ * jeu fixe (2 × 100 visages). Stockée telle quelle en base (`User.avatar_url`).
  */
 export function generateAvatarUrl(): string {
-  const seed = randomBytes(16).toString('hex');
-  return `https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}`;
+  const n = randomBytes(4).readUInt32BE(0);
+  const gender = n % 2 === 0 ? 'men' : 'women';
+  return `https://randomuser.me/api/portraits/${gender}/${n % 100}.jpg`;
 }
 
 export function toSafeUser(user: User): SafeUser {

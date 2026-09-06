@@ -15,39 +15,41 @@ const url = new URL(databaseUrl);
 const DEMO_HASH =
   "$argon2id$v=19$m=65536,t=3,p=4$PWDO9P8vW/kVneWSb5wNXA$r0QTwV0pRyQcnqFl+nLoFdA3XJ+3gMsSDhgs7pvt87o";
 
-const avatar = (seed) =>
-  `https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}`;
+// Portrait réaliste (randomuser.me, CDN public) — `gender` cohérent avec le
+// prénom de l'auteur, `n` fixe le visage (0-99).
+const avatar = (gender, n) =>
+  `https://randomuser.me/api/portraits/${gender}/${n}.jpg`;
 
 const authors = [
   {
     email: "camille.roux@demo.jobtrack",
     first_name: "Camille",
     last_name: "Roux",
-    avatar_url: avatar("camille-roux"),
+    avatar_url: avatar("women", 44),
   },
   {
     email: "sofiane.benali@demo.jobtrack",
     first_name: "Sofiane",
     last_name: "Benali",
-    avatar_url: avatar("sofiane-benali"),
+    avatar_url: avatar("men", 32),
   },
   {
     email: "lea.moreau@demo.jobtrack",
     first_name: "Léa",
     last_name: "Moreau",
-    avatar_url: avatar("lea-moreau"),
+    avatar_url: avatar("women", 68),
   },
   {
     email: "thomas.girard@demo.jobtrack",
     first_name: "Thomas",
     last_name: "Girard",
-    avatar_url: avatar("thomas-girard"),
+    avatar_url: avatar("men", 75),
   },
   {
     email: "nadia.haddad@demo.jobtrack",
     first_name: "Nadia",
     last_name: "Haddad",
-    avatar_url: avatar("nadia-haddad"),
+    avatar_url: avatar("women", 90),
   },
 ];
 
