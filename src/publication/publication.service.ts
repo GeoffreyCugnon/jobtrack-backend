@@ -48,6 +48,9 @@ export class PublicationService {
       timeAgo,
       likesCount: row.likes_count,
       commentsCount: row._count.comment,
+      // Pas de table de republications pour l'instant : valeur dérivée
+      // (déterministe) pour l'affichage, à remplacer par un vrai compteur.
+      sharesCount: Math.round(row.likes_count * 0.15),
     };
   }
 
