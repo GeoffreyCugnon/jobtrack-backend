@@ -97,7 +97,12 @@ export class AuthController {
       //return
       return { accessToken, user: toSafeUser(user) };
     } catch (error) {
-      Logger.error('Erreur refresh', error);
+      // Échec de refresh = cas courant (pas de cookie, token expiré, etc.),
+      // pas une erreur serveur : on répond 401 sans polluer la console.
+      Logger.debug(
+        `refresh échoué : ${error instanceof Error ? error.message : 'inconnu'}`,
+        AuthController.name,
+      );
       throw new UnauthorizedException();
     }
   }

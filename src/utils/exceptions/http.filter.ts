@@ -16,11 +16,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
     const status = exception.getStatus();
+    const line = `${request.method} ${request.url} -> ${status}`;
 
-    this.logger.error(
-      `${request.method} ${request.url} -> ${status}`,
-      JSON.stringify(exception.getResponse()),
-    );
+    // Les 4xx sont des erreurs client normales (401 sur /auth/refresh sans
+    // cookie, 404, validation...) : `debug` pour ne pas polluer la console.
+    // Seuls les 5xx méritent un `error`.
+    if (status >= 500) {
+      this.logger.error(line, JSON.stringify(exception.getResponse()));
+    } else {
+      this.logger.debug(line);
+    }
     response.status(status).json({
       statusCode: status,
       timestamp: new Date().toISOString(),
