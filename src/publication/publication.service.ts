@@ -43,6 +43,7 @@ export class PublicationService {
       authorAvatarUrl: row.user?.avatar_url ?? null,
       title: row.title,
       content: row.content,
+      imageUrl: row.image_url ?? null,
       type: row.type,
       createdAt: createdAt.toISOString(),
       timeAgo,

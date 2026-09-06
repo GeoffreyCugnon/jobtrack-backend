@@ -53,7 +53,7 @@ const authors = [
   },
 ];
 
-// [authorIndex, type, title, content, likes, heuresDansLePasse]
+// [authorIndex, type, title, content, likes, heuresDansLePasse, image?]
 const posts = [
   [
     0,
@@ -62,6 +62,7 @@ const posts = [
     "Super soirée hier au meetup React Côte d'Azur 🎉 Trois talks très concrets : Server Components en prod, tests avec Vitest, et migration progressive vers React 19. Les slides arrivent bientôt, je partagerai le lien ici.",
     27,
     3,
+    "https://picsum.photos/seed/jobtrack-react/1000/560",
   ],
   [
     1,
@@ -78,6 +79,7 @@ const posts = [
     "Il y a 18 mois je bossais dans la logistique, aujourd'hui je suis dev front en alternance. Trois choses qui m'ont aidée : construire un vrai projet perso (pas un énième todo), demander des retours tôt et souvent, et accepter de ne pas tout comprendre au début. Courage à celles et ceux qui se lancent 💪",
     63,
     26,
+    "https://picsum.photos/seed/jobtrack-reconversion/900/1200",
   ],
   [
     3,
@@ -110,6 +112,7 @@ const posts = [
     "On a fini la migration Prisma 6 → 7 la semaine dernière. Le gros morceau : l'adaptateur driver et quelques requêtes brutes à réécrire. Bilan positif, build plus rapide et types plus fins. Je détaille les pièges dans un article à venir.",
     23,
     72,
+    "https://picsum.photos/seed/jobtrack-prisma/1200/675",
   ],
   [
     2,
@@ -151,11 +154,19 @@ async function main() {
     ids,
   );
 
-  for (const [authorIdx, type, title, content, likes, hoursAgo] of posts) {
+  for (const [
+    authorIdx,
+    type,
+    title,
+    content,
+    likes,
+    hoursAgo,
+    image = null,
+  ] of posts) {
     await connection.execute(
-      `INSERT INTO Publication (user_id, title, content, type, is_public, likes_count, created_at, updated_at)
-       VALUES (?, ?, ?, ?, 1, ?, DATE_SUB(NOW(), INTERVAL ? HOUR), DATE_SUB(NOW(), INTERVAL ? HOUR))`,
-      [ids[authorIdx], title, content, type, likes, hoursAgo, hoursAgo],
+      `INSERT INTO Publication (user_id, title, content, image_url, type, is_public, likes_count, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, 1, ?, DATE_SUB(NOW(), INTERVAL ? HOUR), DATE_SUB(NOW(), INTERVAL ? HOUR))`,
+      [ids[authorIdx], title, content, image, type, likes, hoursAgo, hoursAgo],
     );
   }
 
