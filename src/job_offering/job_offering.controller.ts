@@ -44,15 +44,20 @@ export class JobOfferingController {
   @Patch(':id')
   @UseGuards(AuthGuard)
   update(
+    @Req() request: IRequestWithPayload,
     @Param('id') id: string,
     @Body() updateJobOfferingDto: UpdateJobOfferingDto,
   ) {
-    return this.jobOfferingService.update(+id, updateJobOfferingDto);
+    return this.jobOfferingService.update(
+      +id,
+      updateJobOfferingDto,
+      request.user.id,
+    );
   }
 
   @Delete(':id')
   @UseGuards(AuthGuard)
-  remove(@Param('id') id: string) {
-    return this.jobOfferingService.remove(+id);
+  remove(@Req() request: IRequestWithPayload, @Param('id') id: string) {
+    return this.jobOfferingService.remove(+id, request.user.id);
   }
 }

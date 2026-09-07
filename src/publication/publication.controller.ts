@@ -45,15 +45,20 @@ export class PublicationController {
   @Patch(':id')
   @UseGuards(AuthGuard)
   update(
+    @Req() request: IRequestWithPayload,
     @Param('id') id: string,
     @Body() updatePublicationDto: UpdatePublicationDto,
   ) {
-    return this.publicationService.update(+id, updatePublicationDto);
+    return this.publicationService.update(
+      +id,
+      updatePublicationDto,
+      request.user.id,
+    );
   }
 
   @Delete(':id')
   @UseGuards(AuthGuard)
-  remove(@Param('id') id: string) {
-    return this.publicationService.remove(+id);
+  remove(@Req() request: IRequestWithPayload, @Param('id') id: string) {
+    return this.publicationService.remove(+id, request.user.id);
   }
 }

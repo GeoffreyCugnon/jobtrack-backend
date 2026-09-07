@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma } from '../../prisma/generated/prisma/client';
 import { CreateJobOfferingDto } from './dto/create-job_offering.dto';
@@ -214,7 +218,38 @@ export class JobOfferingService {
     return this.toOfferDto(row);
   }
 
-  update(id: number, updateJobOfferingDto: UpdateJobOfferingDto) {
+  /**
+   * Vérifie que `userId` peut agir sur l'offre `id` : l'offre doit être
+   * rattachée à l'entreprise de son `Employment` courant (même règle que
+   * `create()`). Tant qu'aucun `RolesGuard` (rôle recruteur) n'est branché,
+   * c'est la seule barrière.
+   */
+  private async assertCanManage(id: number, userId: number): Promise<void> {
+    const offer = await this.prisma.job_offering.findUnique({
+      where: { id },
+      select: { company_id: true },
+    });
+    if (!offer) {
+      throw new NotFoundException(`Offre ${id} introuvable.`);
+    }
+
+    const employment = await this.prisma.employment.findFirst({
+      where: { user_id: userId, is_current: true },
+      select: { company_id: true },
+    });
+    if (!employment || employment.company_id !== offer.company_id) {
+      throw new ForbiddenException(
+        'Vous ne pouvez gérer que les offres de votre entreprise.',
+      );
+    }
+  }
+
+  async update(
+    id: number,
+    updateJobOfferingDto: UpdateJobOfferingDto,
+    userId: number,
+  ) {
+    await this.assertCanManage(id, userId);
     return this.prisma.job_offering.update({
       where: { id },
       data: {
@@ -223,7 +258,8 @@ export class JobOfferingService {
     });
   }
 
-  remove(id: number) {
+  async remove(id: number, userId: number) {
+    await this.assertCanManage(id, userId);
     return this.prisma.job_offering.delete({ where: { id } });
   }
 }

@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma } from '../../prisma/generated/prisma/client';
 import { CreatePublicationDto } from './dto/create-publication.dto';
@@ -78,14 +82,36 @@ export class PublicationService {
     return row ? this.toDto(row) : null;
   }
 
-  update(id: number, updatePublicationDto: UpdatePublicationDto) {
+  /** Charge une publication vivante et vérifie qu'elle appartient à `userId`. */
+  private async assertOwned(id: number, userId: number): Promise<void> {
+    const row = await this.prisma.publication.findFirst({
+      where: { id, deleted_at: null },
+      select: { user_id: true },
+    });
+    if (!row) {
+      throw new NotFoundException('Publication introuvable.');
+    }
+    if (row.user_id !== userId) {
+      throw new ForbiddenException(
+        'Vous ne pouvez modifier que vos propres publications.',
+      );
+    }
+  }
+
+  async update(
+    id: number,
+    updatePublicationDto: UpdatePublicationDto,
+    userId: number,
+  ) {
+    await this.assertOwned(id, userId);
     return this.prisma.publication.update({
       where: { id },
       data: { ...updatePublicationDto },
     });
   }
 
-  remove(id: number) {
+  async remove(id: number, userId: number) {
+    await this.assertOwned(id, userId);
     return this.prisma.publication.delete({ where: { id } });
   }
 }

@@ -155,4 +155,66 @@ describe('JobOfferingService', () => {
       },
     });
   });
+
+  it('rejects update of an unknown offer with NotFound', async () => {
+    const prisma = {
+      job_offering: {
+        findUnique: vi.fn().mockResolvedValue(null),
+        update: vi.fn(),
+      },
+      employment: { findFirst: vi.fn() },
+    } as any;
+
+    const service = new JobOfferingService(prisma);
+
+    await expect(service.update(99, { title: 'x' }, 42)).rejects.toThrow(
+      /introuvable/i,
+    );
+    expect(prisma.job_offering.update).not.toHaveBeenCalled();
+  });
+
+  it('rejects update when the offer belongs to another company than the user current employment', async () => {
+    const prisma = {
+      job_offering: {
+        findUnique: vi.fn().mockResolvedValue({ company_id: 7 }),
+        update: vi.fn(),
+      },
+      employment: {
+        findFirst: vi.fn().mockResolvedValue({ company_id: 3 }),
+      },
+    } as any;
+
+    const service = new JobOfferingService(prisma);
+
+    await expect(service.update(1, { title: 'x' }, 42)).rejects.toThrow(
+      /votre entreprise/i,
+    );
+    expect(prisma.job_offering.update).not.toHaveBeenCalled();
+  });
+
+  it('allows update/remove when the offer company matches the user current employment', async () => {
+    const prisma = {
+      job_offering: {
+        findUnique: vi.fn().mockResolvedValue({ company_id: 7 }),
+        update: vi.fn().mockResolvedValue({ id: 1 }),
+        delete: vi.fn().mockResolvedValue({ id: 1 }),
+      },
+      employment: {
+        findFirst: vi.fn().mockResolvedValue({ company_id: 7 }),
+      },
+    } as any;
+
+    const service = new JobOfferingService(prisma);
+
+    await service.update(1, { title: 'x' }, 42);
+    await service.remove(1, 42);
+
+    expect(prisma.job_offering.update).toHaveBeenCalledWith({
+      where: { id: 1 },
+      data: { title: 'x' },
+    });
+    expect(prisma.job_offering.delete).toHaveBeenCalledWith({
+      where: { id: 1 },
+    });
+  });
 });
