@@ -25,8 +25,9 @@ export class RoleService {
     return role;
   }
 
-  update(id: number, _updateRoleDto: UpdateRoleDto) {
-    return `This action updates a #${id} role`;
+  async update(id: number, updateRoleDto: UpdateRoleDto): Promise<Role> {
+    await this.findOne(id);
+    return this.prisma.role.update({ where: { id }, data: updateRoleDto });
   }
 
   async delete(id: number): Promise<Role> {
