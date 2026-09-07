@@ -1,12 +1,18 @@
-import { IsString, MinLength } from 'class-validator';
+import { IsString, IsStrongPassword, MaxLength } from 'class-validator';
 
 export class ChangePasswordDto {
   @IsString()
   currentPassword: string;
 
+  // Même politique que `CreateUserDto` / `LoginDto` et que le `passwordSchema`
+  // du Front : 8 caractères min. avec minuscule, majuscule, chiffre et symbole.
   @IsString()
-  @MinLength(8, {
-    message: 'Le mot de passe doit contenir au moins 8 caractères',
+  @IsStrongPassword({
+    minLength: 8,
+    minUppercase: 1,
+    minNumbers: 1,
+    minSymbols: 1,
   })
+  @MaxLength(255)
   newPassword: string;
 }
