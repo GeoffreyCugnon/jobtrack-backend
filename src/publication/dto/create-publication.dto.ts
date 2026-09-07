@@ -2,7 +2,7 @@ import {
   IsBoolean,
   IsEnum,
   IsNotEmpty,
-  IsNumber,
+  IsOptional,
   IsString,
   MaxLength,
 } from 'class-validator';
@@ -21,10 +21,13 @@ export class CreatePublicationDto {
   @IsEnum(Publication_type)
   type: Publication_type;
 
-  @IsNotEmpty()
+  // Optionnel : `Publication.is_public` a `@default(true)` en base. Le client
+  // n'a pas à le fournir pour un post normal.
+  @IsOptional()
   @IsBoolean()
-  is_public: boolean;
+  is_public?: boolean;
 
-  @IsNumber()
-  likes_count: number;
+  // `likes_count` n'est jamais fourni par le client : il démarre à 0
+  // (`@default(0)`) et n'évolue que via les likes. Laisser le client le poser
+  // permettait de créer un post avec un compteur arbitraire.
 }
