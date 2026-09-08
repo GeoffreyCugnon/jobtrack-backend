@@ -136,3 +136,4 @@ Projet solo désormais, plus de suivi par tickets (l'ancienne convention YouTrac
 - `npm run lint` — ESLint avec `--fix`
 - `npm run format` — Prettier sur `src/` et `test/`
 - `npm run test` / `test:watch` / `test:cov` / `test:e2e` — Vitest
+- `npm run prisma:seed` — companies + offres de démo · `prisma:seed:connections` / `prisma:seed:avatars` — voir modules concernés · `prisma:seed:admin` — (ré)insère un 2e compte de login `admin2@jobtrack.local` (compte utilisateur ordinaire, pas de privilège ; email/nom/hash surchargeables par env `ADMIN2_*`)
