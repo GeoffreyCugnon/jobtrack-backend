@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Get,
   Body,
   BadRequestException,
   Res,
@@ -231,5 +232,23 @@ export class AuthController {
       Logger.warn(error);
       throw new BadRequestException();
     }
+  }
+
+  /**
+   * Émet un JWT dédié (HS256, claim `sub`) pour authentifier le Frontend
+   * directement auprès de MS-Messagerie (REST + WebSocket) — ce Backend ne
+   * fait que le fabriquer, il ne relaie aucun appel vers le micro-service.
+   * Voir `AuthService#generateMessagingToken` et `MS-Messagerie/README.md`
+   * (« Contrat d'authentification »).
+   */
+  @Get('messaging-token')
+  @UseGuards(AuthGuard)
+  async getMessagingToken(
+    @Req() request: IRequestWithPayload,
+  ): Promise<{ token: string }> {
+    const token = await this.authService.generateMessagingToken({
+      id: request.user.id,
+    });
+    return { token };
   }
 }

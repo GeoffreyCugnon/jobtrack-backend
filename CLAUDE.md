@@ -61,6 +61,15 @@ Points d'attention :
 
 `auth.service.spec.ts` teste `extractTokenFromCookie` et `verifyResetToken` (token absent, expiré, valide/invalide) en instanciant `AuthService` avec un mock minimal de `JwtService` (`{ signAsync: vi.fn(), verifyAsync: vi.fn() } as any`) — même logique que le pattern `job_offering.service.spec.ts` (instancier le service directement plutôt que passer par le `TestingModule` de Nest), à réutiliser pour les prochains services simples.
 
+## Pont d'authentification vers MS-Messagerie (nouveau)
+
+La partie messagerie a été extraite dans un micro-service séparé (`../../MS-Messagerie`, NestJS + Prisma + PostgreSQL, dépôt indépendant). Le Frontend lui parle **directement** (REST + WebSocket) plutôt que de passer par ce Backend en proxy — voir `Frontend/CLAUDE.md`. Le rôle de ce Backend se limite à fournir le jeton :
+
+- `GET /auth/messaging-token` (protégé par `AuthGuard`) : émet un JWT **dédié**, distinct des tokens access/refresh JobTrack — `AuthService#generateMessagingToken` signe `{ sub: String(user.id) }` en **HS256** (MS-Messagerie l'impose, alors que les tokens JobTrack sont en HS512) avec `MESSAGING_JWT_SECRET`/`MESSAGING_JWT_EXPIRE` (`.env`).
+- `MESSAGING_JWT_SECRET` doit être **strictement identique** à celui de `MS-Messagerie/.env` (chaque instance de MS-Messagerie a son propre secret ; ici les deux sont alignés puisque c'est la même instance qui sert JobTrack). Un changement de secret d'un côté sans l'autre invalide silencieusement tous les tokens de messagerie (401 côté MS).
+- Le claim est `sub` (convention MS-Messagerie), pas `id` comme dans `IPayload` — ne pas réutiliser `generateJwts`/`IPayload` pour ce token.
+- Ce Backend ne relaie aucun appel vers MS-Messagerie (pas de proxy REST/WS) : il ne fait que fabriquer et distribuer le jeton.
+
 ## CORS
 
 `main.ts` n'utilise pas une origine fixe : la fonction `origin` d'`enableCors` autorise dynamiquement toute origine `http(s)://(localhost|127.0.0.1):<port quelconque>` via une regex, `credentials: true`. Objectif : ne pas avoir à retoucher `main.ts` quand le port du Frontend change (5173 → 5174 en fallback Vite, par ex.). Toute origine non-locale reste rejetée — à revoir explicitement avant un déploiement (ajouter le domaine de prod à la regex/whitelist).

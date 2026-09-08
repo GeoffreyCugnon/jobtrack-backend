@@ -66,6 +66,25 @@ export class AuthService {
     });
   }
 
+  /**
+   * Génère un JWT dédié pour authentifier cet utilisateur auprès du
+   * micro-service de messagerie (MS-Messagerie) : HS256 (imposé côté MS,
+   * distinct du HS512 utilisé ci-dessus pour les tokens de session JobTrack),
+   * claim `sub` (id utilisateur stringifié — MS ne connaît que des ids
+   * opaques), secret et durée de vie dédiés (`MESSAGING_JWT_SECRET` /
+   * `MESSAGING_JWT_EXPIRE`). Voir `AuthController#getMessagingToken`.
+   */
+  async generateMessagingToken(user: Pick<User, 'id'>): Promise<string> {
+    return this.jwtService.signAsync(
+      { sub: String(user.id) },
+      {
+        algorithm: 'HS256',
+        secret: process.env.MESSAGING_JWT_SECRET,
+        expiresIn: process.env.MESSAGING_JWT_EXPIRE as JwtSignOptions['expiresIn'],
+      },
+    );
+  }
+
   insertTokenCookie(response: Response, refreshToken: string): void {
     response.cookie('refreshToken', refreshToken, {
       httpOnly: true,
