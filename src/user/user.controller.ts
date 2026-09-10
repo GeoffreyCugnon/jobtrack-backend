@@ -20,6 +20,7 @@ import type { IRequestWithPayload } from '../auth/interface';
 import { UpdateNotificationsDto } from './dto/update-notifications.dto';
 import { UpdateLanguageDto } from './dto/update-language.dto';
 import { UpdateAvatarDto } from './dto/update-avatar.dto';
+import { UpdateBannerDto } from './dto/update-banner.dto';
 
 @UseGuards(AuthGuard)
 @Controller('user')
@@ -74,6 +75,16 @@ export class UserController {
   ): Promise<SafeUser> {
     return await this.userService.update(request.user.id, {
       avatar_url: body.avatarUrl,
+    });
+  }
+
+  @Patch('banner')
+  async updateBanner(
+    @Req() request: IRequestWithPayload,
+    @Body() body: UpdateBannerDto,
+  ): Promise<SafeUser> {
+    return await this.userService.update(request.user.id, {
+      banner_url: body.bannerUrl,
     });
   }
 

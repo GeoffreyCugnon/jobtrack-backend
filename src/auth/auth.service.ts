@@ -80,7 +80,8 @@ export class AuthService {
       {
         algorithm: 'HS256',
         secret: process.env.MESSAGING_JWT_SECRET,
-        expiresIn: process.env.MESSAGING_JWT_EXPIRE as JwtSignOptions['expiresIn'],
+        expiresIn: process.env
+          .MESSAGING_JWT_EXPIRE as JwtSignOptions['expiresIn'],
       },
     );
   }
