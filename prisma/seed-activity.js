@@ -52,6 +52,54 @@ async function seedForUser(conn, userId) {
   await conn.execute('DELETE FROM Application WHERE user_id = ?', [userId]); // -> Interview en cascade
   await conn.execute('DELETE FROM Document WHERE user_id = ?', [userId]);
   await conn.execute('DELETE FROM Comment WHERE user_id = ?', [userId]);
+  await conn.execute('DELETE FROM User_skill WHERE user_id = ?', [userId]);
+
+  // --- Profil (champs éditables) -------------------------------------
+  await conn.execute(
+    `UPDATE User SET headline = ?, bio = ?, location = ?, phone = ?,
+       website = ?, linkedin = ?, github = ?, updated_at = NOW()
+     WHERE id = ?`,
+    [
+      'Développeur Web Fullstack',
+      "En reconversion réussie vers le développement web, spécialisé React / Node.js. Je cherche une équipe produit où apprendre vite et livrer utile.",
+      'Nice, France',
+      '+33 6 12 34 56 78',
+      'exemple.dev',
+      'linkedin.com/in/exemple',
+      'github.com/exemple',
+      userId,
+    ],
+  );
+
+  // --- Compétences -------------------------------------------------------
+  const skills = [
+    'React',
+    'TypeScript',
+    'Node.js',
+    'NestJS',
+    'PostgreSQL',
+    'Tailwind CSS',
+    'Git',
+    'Docker',
+    'Tests (Vitest / Cypress)',
+    'Autonomie',
+  ];
+  for (const name of skills) {
+    await conn.execute(
+      `INSERT INTO Skill (name, created_at, updated_at) VALUES (?, NOW(), NOW())
+       ON DUPLICATE KEY UPDATE updated_at = NOW()`,
+      [name],
+    );
+    const [[{ id: skillId }]] = await conn.query(
+      'SELECT id FROM Skill WHERE name = ?',
+      [name],
+    );
+    await conn.execute(
+      `INSERT IGNORE INTO User_skill (user_id, skill_id, created_at, updated_at)
+       VALUES (?, ?, NOW(), NOW())`,
+      [userId, skillId],
+    );
+  }
 
   // --- Candidatures (entreprises variées : offres 1 / 3 / 4 / 6 / 8) ----
   const applications = [
@@ -153,6 +201,7 @@ async function seedForUser(conn, userId) {
     interviews: interviews.length,
     documents: documents.length,
     comments: Math.min(comments.length, publications.length),
+    skills: skills.length,
   };
 }
 
@@ -175,7 +224,7 @@ async function main() {
     const counts = await seedForUser(conn, userId);
     seeded += 1;
     console.log(
-      `- ${email} (#${userId}) : ${counts.applications} candidatures, ${counts.interviews} entretiens, ${counts.documents} documents, ${counts.comments} commentaires.`,
+      `- ${email} (#${userId}) : ${counts.applications} candidatures, ${counts.interviews} entretiens, ${counts.documents} documents, ${counts.comments} commentaires, ${counts.skills} compétences.`,
     );
   }
 

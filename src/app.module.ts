@@ -15,11 +15,12 @@ import { NotificationModule } from './notification/notification.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { PublicationModule } from './publication/publication.module';
 import { RoleModule } from './role/role.module';
+import { SkillModule } from './skill/skill.module';
 import { AuthModule } from './auth/auth.module';
 
 /**
  * Seuls les modules réellement implémentés sont montés. Les modules encore au
- * stade du scaffold `nest g resource` (contact, employment, message, skill)
+ * stade du scaffold `nest g resource` (contact, employment, message)
  * restent hors de l'app : leurs endpoints renverraient des chaînes factices.
  * `company` est aussi hors app : CRUD réel mais aucune vérif de propriété
  * (DELETE cascaderait sur les offres) et non consommé par le Front — à
@@ -45,6 +46,7 @@ import { AuthModule } from './auth/auth.module';
     NotificationModule,
     PublicationModule,
     RoleModule,
+    SkillModule,
     AuthModule,
   ],
 })

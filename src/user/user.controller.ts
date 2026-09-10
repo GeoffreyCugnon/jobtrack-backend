@@ -21,6 +21,7 @@ import { UpdateNotificationsDto } from './dto/update-notifications.dto';
 import { UpdateLanguageDto } from './dto/update-language.dto';
 import { UpdateAvatarDto } from './dto/update-avatar.dto';
 import { UpdateBannerDto } from './dto/update-banner.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @UseGuards(AuthGuard)
 @Controller('user')
@@ -66,6 +67,21 @@ export class UserController {
     @Body() body: UpdateLanguageDto,
   ): Promise<SafeUser> {
     return await this.userService.update(request.user.id, body);
+  }
+
+  @Patch('profile')
+  async updateProfile(
+    @Req() request: IRequestWithPayload,
+    @Body() body: UpdateProfileDto,
+  ): Promise<SafeUser> {
+    // Chaîne vide = champ effacé -> `null` en base.
+    const data = Object.fromEntries(
+      Object.entries(body).map(([key, value]) => [
+        key,
+        value === '' ? null : value,
+      ]),
+    );
+    return this.userService.update(request.user.id, data);
   }
 
   @Patch('avatar')

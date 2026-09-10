@@ -246,6 +246,13 @@ model User {
   email                                        String             @unique(map: "email") @db.VarChar(255)
   password                                     String             @db.VarChar(255)
   avatar_url                                   String?            @db.Text
+  headline                                     String?            @db.VarChar(150)
+  bio                                          String?            @db.Text
+  location                                     String?            @db.VarChar(150)
+  phone                                        String?            @db.VarChar(40)
+  website                                      String?            @db.VarChar(255)
+  linkedin                                     String?            @db.VarChar(255)
+  github                                       String?            @db.VarChar(255)
   banner_url                                   String?            @db.LongText
   notifications_enabled                        Boolean            @default(true)
   language                                     String             @default("fr")
