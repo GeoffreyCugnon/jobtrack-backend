@@ -189,6 +189,7 @@ export class JobOfferingService {
 
   async findAll() {
     const rows = await this.prisma.job_offering.findMany({
+      where: { deleted_at: null },
       include: {
         company: true,
         application: { select: { id: true } },
@@ -200,8 +201,8 @@ export class JobOfferingService {
   }
 
   async findOne(id: number) {
-    const row = await this.prisma.job_offering.findUnique({
-      where: { id },
+    const row = await this.prisma.job_offering.findFirst({
+      where: { id, deleted_at: null },
       include: { company: true, application: { select: { id: true } } },
     });
 

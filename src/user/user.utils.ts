@@ -27,6 +27,13 @@ export function generateAvatarUrl(): string {
   return `https://randomuser.me/api/portraits/${gender}/${n % 100}.jpg`;
 }
 
+/**
+ * Filtre un `User` déjà chargé (destructuration runtime). Volontairement
+ * conservé en plus de `SAFE_USER_OMIT` : `auth` charge la ligne complète pour
+ * comparer mot de passe / refresh token, puis renvoie la version « safe » sans
+ * refaire une requête. Les routes `user` qui n'ont pas besoin du hash utilisent
+ * `SAFE_USER_OMIT` (omit Prisma) directement.
+ */
 export function toSafeUser(user: User): SafeUser {
   const {
     password: _password,
