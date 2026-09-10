@@ -7,6 +7,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma } from '../../prisma/generated/prisma/client';
 import { CreateJobOfferingDto } from './dto/create-job_offering.dto';
 import { UpdateJobOfferingDto } from './dto/update-job_offering.dto';
+import { formatRelativeFr, hoursSince } from '../utils/relative-time';
 
 /** Ligne `job_offering` telle que chargée par `findAll()`/`findOne()` (relations incluses). */
 type OfferRow = Prisma.Job_offeringGetPayload<{
@@ -144,14 +145,7 @@ export class JobOfferingService {
   }
 
   private toOfferDto(row: OfferRow) {
-    const createdAt = new Date(row.created_at);
-    const hoursAgo = Math.max(
-      1,
-      Math.min(
-        168,
-        Math.round((Date.now() - createdAt.getTime()) / (1000 * 60 * 60)),
-      ),
-    );
+    const hoursAgo = hoursSince(row.created_at);
 
     return {
       id: row.id,
@@ -160,7 +154,7 @@ export class JobOfferingService {
       contractType: row.contract_type,
       company: row.company?.name ?? 'Entreprise',
       location: row.company?.address ?? 'France',
-      timeAgo: `Il y a ${hoursAgo}h`,
+      timeAgo: formatRelativeFr(row.created_at),
       postedHoursAgo: hoursAgo,
       category: this.inferCategory(row.title),
       workMode: this.inferWorkMode(row.title),

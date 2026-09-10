@@ -8,6 +8,7 @@ import { Prisma } from '../../prisma/generated/prisma/client';
 import { Application_status } from '../../prisma/generated/prisma/enums';
 import { CreateApplicationDto } from './dto/create-application.dto';
 import { UpdateApplicationDto } from './dto/update-application.dto';
+import { assertOwnership } from '../utils/ownership';
 
 /** Ligne `Application` chargée ici (offre + entreprise + entretiens). */
 type ApplicationRow = Prisma.ApplicationGetPayload<{
@@ -102,19 +103,11 @@ export class ApplicationService {
     return this.toDto(row);
   }
 
-  private async assertOwned(id: number, userId: number): Promise<void> {
-    const row = await this.prisma.application.findUnique({
-      where: { id },
-      select: { user_id: true },
+  private assertOwned(id: number, userId: number): Promise<void> {
+    return assertOwnership(this.prisma.application, id, userId, {
+      notFound: 'Candidature introuvable.',
+      forbidden: 'Vous ne pouvez modifier que vos propres candidatures.',
     });
-    if (!row) {
-      throw new NotFoundException('Candidature introuvable.');
-    }
-    if (row.user_id !== userId) {
-      throw new ForbiddenException(
-        'Vous ne pouvez modifier que vos propres candidatures.',
-      );
-    }
   }
 
   async update(id: number, dto: UpdateApplicationDto, userId: number) {

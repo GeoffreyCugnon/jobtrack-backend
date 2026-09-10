@@ -1,11 +1,9 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma } from '../../prisma/generated/prisma/client';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { formatRelativeFr } from '../utils/relative-time';
+import { assertOwnership } from '../utils/ownership';
 
 /** Ligne `Comment` chargée ici (auteur inclus pour l'affichage). */
 type CommentRow = Prisma.CommentGetPayload<{
@@ -33,16 +31,6 @@ export class CommentService {
 
   private toDto(row: CommentRow) {
     const createdAt = new Date(row.created_at);
-    const minutesAgo = Math.max(
-      1,
-      Math.round((Date.now() - createdAt.getTime()) / 60000),
-    );
-    const time =
-      minutesAgo < 60
-        ? `Il y a ${minutesAgo} min`
-        : minutesAgo < 60 * 24
-          ? `Il y a ${Math.round(minutesAgo / 60)} h`
-          : `Il y a ${Math.round(minutesAgo / (60 * 24))} j`;
 
     return {
       id: row.id,
@@ -55,7 +43,7 @@ export class CommentService {
       authorAvatarUrl: row.user?.avatar_url ?? null,
       text: row.content,
       createdAt: createdAt.toISOString(),
-      time,
+      time: formatRelativeFr(createdAt),
     };
   }
 
@@ -90,18 +78,10 @@ export class CommentService {
   }
 
   async remove(id: number, userId: number) {
-    const row = await this.prisma.comment.findUnique({
-      where: { id },
-      select: { user_id: true },
+    await assertOwnership(this.prisma.comment, id, userId, {
+      notFound: 'Commentaire introuvable.',
+      forbidden: 'Vous ne pouvez supprimer que vos propres commentaires.',
     });
-    if (!row) {
-      throw new NotFoundException('Commentaire introuvable.');
-    }
-    if (row.user_id !== userId) {
-      throw new ForbiddenException(
-        'Vous ne pouvez supprimer que vos propres commentaires.',
-      );
-    }
     await this.prisma.comment.delete({ where: { id } });
     return { id };
   }

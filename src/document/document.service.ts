@@ -1,14 +1,11 @@
 import { randomUUID } from 'node:crypto';
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma } from '../../prisma/generated/prisma/client';
 import { Document_type } from '../../prisma/generated/prisma/enums';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
+import { assertOwnership } from '../utils/ownership';
 
 type DocumentRow = Prisma.DocumentGetPayload<object>;
 
@@ -59,19 +56,11 @@ export class DocumentService {
     return this.toDto(row);
   }
 
-  private async assertOwned(id: number, userId: number): Promise<void> {
-    const row = await this.prisma.document.findUnique({
-      where: { id },
-      select: { user_id: true },
+  private assertOwned(id: number, userId: number): Promise<void> {
+    return assertOwnership(this.prisma.document, id, userId, {
+      notFound: 'Document introuvable.',
+      forbidden: 'Vous ne pouvez modifier que vos propres documents.',
     });
-    if (!row) {
-      throw new NotFoundException('Document introuvable.');
-    }
-    if (row.user_id !== userId) {
-      throw new ForbiddenException(
-        'Vous ne pouvez modifier que vos propres documents.',
-      );
-    }
   }
 
   async update(id: number, dto: UpdateDocumentDto, userId: number) {

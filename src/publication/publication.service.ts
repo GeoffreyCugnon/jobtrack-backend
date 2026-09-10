@@ -7,6 +7,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma } from '../../prisma/generated/prisma/client';
 import { CreatePublicationDto } from './dto/create-publication.dto';
 import { UpdatePublicationDto } from './dto/update-publication.dto';
+import { formatRelativeFr } from '../utils/relative-time';
 
 /** Ligne `Publication` telle que chargée ici (auteur + compteur de commentaires). */
 type PublicationRow = Prisma.PublicationGetPayload<{
@@ -29,14 +30,6 @@ export class PublicationService {
 
   private toDto(row: PublicationRow) {
     const createdAt = new Date(row.created_at);
-    const hoursAgo = Math.max(
-      1,
-      Math.round((Date.now() - createdAt.getTime()) / (1000 * 60 * 60)),
-    );
-    const timeAgo =
-      hoursAgo < 24
-        ? `Il y a ${hoursAgo} h`
-        : `Il y a ${Math.round(hoursAgo / 24)} j`;
 
     return {
       id: row.id,
@@ -50,7 +43,7 @@ export class PublicationService {
       imageUrl: row.image_url ?? null,
       type: row.type,
       createdAt: createdAt.toISOString(),
-      timeAgo,
+      timeAgo: formatRelativeFr(createdAt),
       likesCount: row.likes_count,
       commentsCount: row._count.comment,
       // Pas de table de republications pour l'instant : valeur dérivée
