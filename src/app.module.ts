@@ -4,8 +4,13 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 
 import { ConfigModule } from '@nestjs/config';
+import { ApplicationModule } from './application/application.module';
+import { CommentModule } from './comment/comment.module';
 import { CompanyModule } from './company/company.module';
 import { ConnectionModule } from './connection/connection.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { DocumentModule } from './document/document.module';
+import { InterviewModule } from './interview/interview.module';
 import { JobOfferingModule } from './job_offering/job_offering.module';
 import { NotificationModule } from './notification/notification.module';
 import { PrismaModule } from '../prisma/prisma.module';
@@ -15,11 +20,11 @@ import { AuthModule } from './auth/auth.module';
 
 /**
  * Seuls les modules réellement implémentés sont montés. Les modules encore au
- * stade du scaffold `nest g resource` (application, comment, contact, document,
- * employment, interview, message, skill) ont été retirés : leurs endpoints
- * renvoyaient des chaînes factices (« This action returns all … ») en 200. Les
- * régénérer avec `nest g resource <nom>` au moment de les implémenter, puis les
- * rajouter ici.
+ * stade du scaffold `nest g resource` (contact, employment, message, skill)
+ * restent hors de l'app : leurs endpoints renverraient des chaînes factices.
+ * `application`, `comment`, `dashboard`, `document` et `interview` ont été
+ * (ré)implémentés (câblage Front des pages Candidatures / Entretiens /
+ * Documents / commentaires d'actu / tuiles du tableau de bord).
  */
 @Module({
   controllers: [AppController],
@@ -28,8 +33,13 @@ import { AuthModule } from './auth/auth.module';
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
     UserModule,
+    ApplicationModule,
+    CommentModule,
     CompanyModule,
     ConnectionModule,
+    DashboardModule,
+    DocumentModule,
+    InterviewModule,
     JobOfferingModule,
     NotificationModule,
     PublicationModule,
