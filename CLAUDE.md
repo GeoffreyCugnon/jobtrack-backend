@@ -35,7 +35,13 @@ Reste ouvert (non bloquant, à faire quand le besoin apparaît) : pas encore de 
 
 `prisma/schema.prisma` : modèles en **PascalCase** (`Application`, `Job_offering`, `Skill`, `User`...), mais champs et enums restent en **snake_case** (`user_id`, `created_at`, `Application_status`). Pas de `@@map` explicite — les noms de table réels en MySQL doivent donc correspondre au nom du modèle tel quel ; ça fonctionne tant que la collation est insensible à la casse (par défaut sur Windows/MySQL), à vérifier si un déploiement change cet environnement.
 
-Modèles : `User`, `User_skill`, `Skill`, `Company`, `Company_follower`, `Contact`, `Employment`, `Job_offering`, `Application`, `Application_document`, `Document`, `Interview`, `Message`, `Comment`, `Publication`, `Connection`, `Notification`, `Role`. Le modèle `event` a été supprimé (le module `events` correspondant aussi — voir plus bas).
+Modèles : `User`, `User_skill`, `Skill`, `Company`, `Company_follower`, `Contact`, `Employment`, `Job_category`, `Job_offering`, `Application`, `Application_document`, `Document`, `Interview`, `Message`, `Comment`, `Publication`, `Connection`, `Notification`, `Role`. Le modèle `event` a été supprimé (le module `events` correspondant aussi — voir plus bas).
+
+`Job_category` : référentiel des catégories d'offres (13 lignes, secteurs + modes de travail), poussé en base depuis l'ancienne constante Front `data/offerCategories`. Seule la donnée y vit (`key`/`label`/`description`/`is_work_mode`/`sort_order`) ; le pictogramme + la pastille de couleur restent au Front (`getCategoryStyle(key)`). `key` = clé renvoyée par `JobOfferingService.inferCategory`/`inferWorkMode`. Exposé public par `GET /job-categories` (`job_category` module). Seed : `npm run prisma:seed:categories` (idempotent, upsert par `key`).
+
+### Historique des migrations réparé (sept. 2026)
+
+Le journal `_prisma_migrations` de la base partagée était désynchronisé (une ligne `20260629073007_init` en échec bloquait `migrate deploy`, 12 migrations appliquées mais non enregistrées, un `20260625135557_init` fantôme absent en local). Réconcilié : la table liste désormais exactement les 17 migrations locales comme appliquées, `npx prisma migrate status` est **propre**. `migrate deploy` reste néanmoins à éviter sur cette base (le schéma réel a été construit hors journal) ; pour un changement de schéma, garder le workflow : écrire le dossier `prisma/migrations/<ts>_<nom>/` + appliquer le SQL en direct (mysql2) + `npx prisma migrate resolve --applied <nom>` + `npx prisma generate`. Les ~18 tables minuscules orphelines (doublons laissés par la migration `pascal_case_model`) sont sans effet, laissées en place.
 
 Les dossiers `entities/` générés par `nest g resource` ont été **supprimés** (audit v3) : les services utilisent directement les types Prisma générés (`../../prisma/generated/prisma/client`). Ne pas recréer de `*.entity.ts`.
 
@@ -84,7 +90,7 @@ Réutiliser ces filtres plutôt que du `try/catch` ad hoc dans les services pour
 
 ## Organisation des modules
 
-Modules renommés au singulier lors d'un audit précédent (`applications` → `application`, `jobs` → `job_offering`, etc.). **Liste actuelle** : `auth`, `company`, `connection`, `job_offering`, `notification`, `publication`, `role`, `user`, plus `utils/` (filtres d'exception, enum Prisma partagés).
+Modules renommés au singulier lors d'un audit précédent (`applications` → `application`, `jobs` → `job_offering`, etc.). **Liste actuelle** : `auth`, `company`, `connection`, `job_category`, `job_offering`, `notification`, `publication`, `role`, `user`, plus `utils/` (filtres d'exception, enum Prisma partagés).
 
 Encore retirés d'`AppModule` (stade scaffold, `"This action returns all …"`) : `application`, `comment`, `contact`, `document`, `employment`, `interview`, `message`, `skill`. Les régénérer avec `nest g resource <nom>` **au moment de les implémenter**, puis les remonter dans `app.module.ts`. `connection` a été recréé (voir ci-dessous). Le module `events` avait été supprimé plus tôt.
 
@@ -111,6 +117,10 @@ Seed : `prisma/seed-connections.js` (`npm run prisma:seed:connections`, `ADMIN_E
 
 Ce module a son test unitaire, `job_offering.service.spec.ts` : instancie le service directement (`new JobOfferingService(prisma)`), mocke `PrismaService` avec `vi.fn().mockResolvedValue(...)`, et couvre la forme retournée par `findAll()`, le mapping `verified` ← `company.verified`, et les deux branches de `create()` (rejet sans entreprise / rattachement au bon `company_id`). **C'est le pattern de référence à reproduire** pour les prochains tests unitaires de service (pas besoin du `TestingModule` de Nest pour un service sans autre dépendance injectée qu'un mock).
 
+## Module `job_category`
+
+`GET /job-categories` (public, comme `GET /job-offering`) → référentiel `Job_category` mappé en camelCase (`key/label/description/isWorkMode/sortOrder`), ordonné `sort_order` puis `label`. Service = un seul `findMany`, testé (`job_category.service.spec.ts`, même pattern que ci-dessus). Le Front le consomme via `useJobCategories()` (React Query, `staleTime` 1 h) pour le filtre « Catégorie » et le libellé de la fiche offre — cf. `Frontend/CLAUDE.md`.
+
 ## État d'avancement
 
 Modules réellement câblés (après audit v3, les scaffolds ont été supprimés) : `auth`, `user`, `company`, `notification`, `role`, `job_offering`, `publication`. Tous les contrôleurs sont protégés par `@UseGuards(AuthGuard)` au niveau classe. Vérification de propriété présente sur `user` (`_assertSelf`), `notification` (`target_user_id`), `connection`, `publication` (`user_id`) et `job_offering` (entreprise de l'`Employment` courant) ; **absente** sur `company` et `role` (auth seule) — ne pas supposer qu'un endpoint gère l'autorisation fine sans avoir lu le service.
@@ -136,4 +146,4 @@ Projet solo désormais, plus de suivi par tickets (l'ancienne convention YouTrac
 - `npm run lint` — ESLint avec `--fix`
 - `npm run format` — Prettier sur `src/` et `test/`
 - `npm run test` / `test:watch` / `test:cov` / `test:e2e` — Vitest
-- `npm run prisma:seed` — companies + offres de démo · `prisma:seed:connections` / `prisma:seed:avatars` — voir modules concernés · `prisma:seed:admin` — (ré)insère un 2e compte de login `admin2@jobtrack.local` (compte utilisateur ordinaire, pas de privilège ; email/nom/hash surchargeables par env `ADMIN2_*`)
+- `npm run prisma:seed` — companies + offres de démo · `prisma:seed:categories` — référentiel `Job_category` (13 lignes, idempotent) · `prisma:seed:connections` / `prisma:seed:avatars` — voir modules concernés · `prisma:seed:admin` — (ré)insère un 2e compte de login `admin2@jobtrack.local` (compte utilisateur ordinaire, pas de privilège ; email/nom/hash surchargeables par env `ADMIN2_*`)

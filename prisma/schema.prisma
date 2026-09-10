@@ -154,6 +154,22 @@ model Interview {
   @@index([scheduled_at], map: "fk_interview_schedule")
 }
 
+/// Référentiel des catégories d'offres (secteur d'activité + modes de travail).
+/// Alimente le filtre « Catégorie » du Front et la résolution du libellé sur
+/// la fiche offre. `key` = clé stable renvoyée par `JobOfferingService`
+/// (`inferCategory` / `inferWorkMode`). Le pictogramme et la pastille de
+/// couleur restent côté Front (map `key` -> style dans `data/offerCategories`).
+model Job_category {
+  id           Int      @id @unique(map: "id_UNIQUE") @default(autoincrement())
+  key          String   @unique(map: "job_category_key_UNIQUE") @db.VarChar(50)
+  label        String   @db.VarChar(100)
+  description  String   @db.Text
+  is_work_mode Boolean  @default(false)
+  sort_order   Int      @default(0)
+  created_at   DateTime @default(now()) @db.Timestamp(0)
+  updated_at   DateTime @default(now()) @db.Timestamp(0)
+}
+
 model Job_offering {
   id            Int                        @id @unique(map: "id_UNIQUE") @default(autoincrement())
   company_id    Int

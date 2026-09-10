@@ -10,6 +10,7 @@ import { ConnectionModule } from './connection/connection.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { DocumentModule } from './document/document.module';
 import { InterviewModule } from './interview/interview.module';
+import { JobCategoryModule } from './job_category/job_category.module';
 import { JobOfferingModule } from './job_offering/job_offering.module';
 import { NotificationModule } from './notification/notification.module';
 import { PrismaModule } from '../prisma/prisma.module';
@@ -42,6 +43,7 @@ import { AuthModule } from './auth/auth.module';
     DashboardModule,
     DocumentModule,
     InterviewModule,
+    JobCategoryModule,
     JobOfferingModule,
     NotificationModule,
     PublicationModule,

@@ -18,6 +18,7 @@
     "prisma:seed:connections": "node prisma/seed-connections.js",
     "prisma:seed:avatars": "node prisma/seed-avatars.js",
     "prisma:seed:activity": "node prisma/seed-activity.js",
+    "prisma:seed:categories": "node prisma/seed-job-categories.js",
     "postinstall": "prisma generate",
     "test": "vitest run",
     "test:watch": "vitest",
