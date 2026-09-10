@@ -6,7 +6,6 @@ import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { ApplicationModule } from './application/application.module';
 import { CommentModule } from './comment/comment.module';
-import { CompanyModule } from './company/company.module';
 import { ConnectionModule } from './connection/connection.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { DocumentModule } from './document/document.module';
@@ -22,6 +21,9 @@ import { AuthModule } from './auth/auth.module';
  * Seuls les modules réellement implémentés sont montés. Les modules encore au
  * stade du scaffold `nest g resource` (contact, employment, message, skill)
  * restent hors de l'app : leurs endpoints renverraient des chaînes factices.
+ * `company` est aussi hors app : CRUD réel mais aucune vérif de propriété
+ * (DELETE cascaderait sur les offres) et non consommé par le Front — à
+ * réactiver avec un `RolesGuard` (rôle `CEO`).
  * `application`, `comment`, `dashboard`, `document` et `interview` ont été
  * (ré)implémentés (câblage Front des pages Candidatures / Entretiens /
  * Documents / commentaires d'actu / tuiles du tableau de bord).
@@ -35,7 +37,6 @@ import { AuthModule } from './auth/auth.module';
     UserModule,
     ApplicationModule,
     CommentModule,
-    CompanyModule,
     ConnectionModule,
     DashboardModule,
     DocumentModule,
