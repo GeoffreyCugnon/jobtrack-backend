@@ -26,11 +26,27 @@ export class HttpExceptionFilter implements ExceptionFilter {
     } else {
       this.logger.debug(line);
     }
+
+    // `exception.message` vaut juste "Bad Request Exception" pour les erreurs
+    // de validation du `ValidationPipe` global — le détail utile (« URL
+    // invalid », etc.) vit dans `getResponse().message` (string ou string[]
+    // selon le nombre de champs en erreur). On l'utilise en priorité, et on
+    // aplatit un tableau pour garder un `message` toujours en string côté
+    // client (toutes les pages qui l'affichent l'attendent tel quel).
+    const body = exception.getResponse();
+    const rawMessage =
+      typeof body === 'object' && body !== null && 'message' in body
+        ? (body as { message: string | string[] }).message
+        : exception.message;
+    const message = Array.isArray(rawMessage)
+      ? rawMessage.join(' ')
+      : rawMessage;
+
     response.status(status).json({
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
-      message: exception.message,
+      message,
     });
   }
 }

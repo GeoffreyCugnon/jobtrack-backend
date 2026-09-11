@@ -58,8 +58,12 @@ model Company {
   id               Int                @id @unique(map: "id_UNIQUE") @default(autoincrement())
   name             String             @unique(map: "company_name_UNIQUE") @db.VarChar(255)
   business_sector  String             @db.VarChar(150)
+  size             String?            @db.VarChar(20)
   website          String?            @db.VarChar(255)
   address          String?            @db.Text
+  description      String?            @db.Text
+  logo_url         String?            @db.LongText
+  banner_url       String?            @db.LongText
   is_public        Boolean            @default(true)
   verified         Boolean            @default(false)
   created_at       DateTime           @default(now()) @db.Timestamp(0)

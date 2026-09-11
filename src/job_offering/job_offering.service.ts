@@ -153,6 +153,8 @@ export class JobOfferingService {
       description: row.description,
       contractType: row.contract_type,
       company: row.company?.name ?? 'Entreprise',
+      companyId: row.company_id,
+      companyLogoUrl: row.company?.logo_url ?? undefined,
       location: row.company?.address ?? 'France',
       timeAgo: formatRelativeFr(row.created_at),
       postedHoursAgo: hoursAgo,
