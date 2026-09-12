@@ -21,6 +21,13 @@ export class CreatePublicationDto {
   @IsEnum(Publication_type)
   type: Publication_type;
 
+  // Optionnel : image jointe au post (data URL générée côté client via
+  // `fileToPostImageDataUrl`, ou URL https) — même contrat que
+  // `Company.logo_url`/`banner_url`.
+  @IsOptional()
+  @IsString()
+  image_url?: string;
+
   // Optionnel : `Publication.is_public` a `@default(true)` en base. Le client
   // n'a pas à le fournir pour un post normal.
   @IsOptional()

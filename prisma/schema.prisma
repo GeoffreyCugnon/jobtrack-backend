@@ -228,7 +228,7 @@ model Publication {
   user_id     Int
   title       String           @db.VarChar(255)
   content     String           @db.Text
-  image_url   String?          @db.Text
+  image_url   String?          @db.LongText
   type        Publication_type
   is_public   Boolean          @default(true)
   likes_count Int              @default(0)
