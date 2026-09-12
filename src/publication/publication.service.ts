@@ -75,7 +75,11 @@ export class PublicationService {
     return row ? this.toDto(row) : null;
   }
 
-  /** Charge une publication vivante et vérifie qu'elle appartient à `userId`. */
+  /**
+   * Charge une publication vivante et vérifie qu'elle appartient à `userId`.
+   * Ne réutilise pas `utils/ownership.ts#assertOwnership` : ce helper est basé
+   * sur `findUnique`, incompatible avec le filtre `deleted_at: null` requis ici.
+   */
   private async assertOwned(id: number, userId: number): Promise<void> {
     const row = await this.prisma.publication.findFirst({
       where: { id, deleted_at: null },

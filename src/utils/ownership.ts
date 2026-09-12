@@ -12,9 +12,11 @@ interface OwnableDelegate {
  * Vérifie qu'une ressource existe et appartient à `userId` (colonne `user_id`
  * directe). Lève `NotFoundException` / `ForbiddenException` avec les libellés
  * fournis. Remplace les `assertOwned` dupliqués des services à owner direct
- * (`application`, `comment`, `document`, `publication`). Les modules à owner
- * indirect (`interview` via la candidature, `job_offering` via l'entreprise)
- * gardent leur logique propre.
+ * (`application`, `comment`, `document`). Les modules à owner indirect
+ * (`interview` via la candidature, `job_offering` via l'entreprise) gardent
+ * leur logique propre. `publication` aussi : son `assertOwned` doit en plus
+ * filtrer `deleted_at: null` (soft-delete), ce que `findUnique` ci-dessous ne
+ * permet pas — pas une duplication oubliée, un besoin réellement différent.
  */
 export async function assertOwnership(
   delegate: OwnableDelegate,
