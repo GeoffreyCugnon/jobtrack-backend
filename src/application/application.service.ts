@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -90,6 +91,16 @@ export class ApplicationService {
     });
     if (!offer) {
       throw new NotFoundException('Offre introuvable.');
+    }
+
+    // Pas de contrainte d'unicité en base sur [user_id, job_offering_id] :
+    // vérif applicative pour bloquer une double candidature à la même offre.
+    const existing = await this.prisma.application.findFirst({
+      where: { user_id: userId, job_offering_id: dto.job_offering_id },
+      select: { id: true },
+    });
+    if (existing) {
+      throw new ConflictException('Vous avez déjà postulé à cette offre.');
     }
 
     const row = await this.prisma.application.create({

@@ -50,4 +50,21 @@ describe('ApplicationService — propriété', () => {
     );
     expect(prisma.application.create).not.toHaveBeenCalled();
   });
+
+  it('refuse une seconde candidature à la même offre', async () => {
+    const prisma = {
+      job_offering: { findUnique: vi.fn().mockResolvedValue({ id: 1 }) },
+      application: {
+        findFirst: vi.fn().mockResolvedValue({ id: 5 }),
+        create: vi.fn(),
+      },
+    } as any;
+
+    const service = new ApplicationService(prisma);
+
+    await expect(service.create({ job_offering_id: 1 }, 42)).rejects.toThrow(
+      /déjà postulé/i,
+    );
+    expect(prisma.application.create).not.toHaveBeenCalled();
+  });
 });
