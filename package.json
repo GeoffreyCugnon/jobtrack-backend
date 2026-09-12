@@ -19,6 +19,8 @@
     "prisma:seed:avatars": "node prisma/seed-avatars.js",
     "prisma:seed:activity": "node prisma/seed-activity.js",
     "prisma:seed:categories": "node prisma/seed-job-categories.js",
+    "prisma:seed:company-logos": "node prisma/seed-company-logos.js",
+    "prisma:seed:applications": "node prisma/seed-applications.js",
     "postinstall": "prisma generate",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -43,6 +45,8 @@
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
+    "@dicebear/collection": "^9.4.3",
+    "@dicebear/core": "^9.4.3",
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
     "@nestjs/cli": "^11.0.0",
