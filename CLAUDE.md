@@ -90,9 +90,20 @@ Réutiliser ces filtres plutôt que du `try/catch` ad hoc dans les services pour
 
 ## Organisation des modules
 
-Modules renommés au singulier lors d'un audit précédent (`applications` → `application`, `jobs` → `job_offering`, etc.). **Liste actuelle** : `auth`, `company`, `connection`, `job_category`, `job_offering`, `notification`, `publication`, `role`, `user`, plus `utils/` (filtres d'exception, enum Prisma partagés).
+Modules renommés au singulier lors d'un audit précédent (`applications` → `application`, `jobs` → `job_offering`, etc.). **Liste actuelle** (audit v5, à jour) : `auth`, `application`, `comment`, `company`, `connection`, `dashboard`, `document`, `interview`, `job_category`, `job_offering`, `notification`, `publication`, `role`, `skill`, `user`, plus `utils/` (filtres d'exception, enum Prisma partagés, `ownership.ts`, `relative-time.ts`).
 
-Encore retirés d'`AppModule` (stade scaffold, `"This action returns all …"`) : `application`, `comment`, `contact`, `document`, `employment`, `interview`, `message`, `skill`. Les régénérer avec `nest g resource <nom>` **au moment de les implémenter**, puis les remonter dans `app.module.ts`. `connection` a été recréé (voir ci-dessous). Le module `events` avait été supprimé plus tôt.
+Encore retirés d'`AppModule` (stade scaffold, `"This action returns all …"`) : `contact`, `employment`, `message`. Les régénérer avec `nest g resource <nom>` **au moment de les implémenter**, puis les remonter dans `app.module.ts`. Le module `events` avait été supprimé plus tôt.
+
+**`application`, `comment`, `dashboard`, `document`, `interview`, `skill` ont depuis été réimplémentés et remontés** (retirés au stade scaffold à l'audit v3, avant de repasser par `nest g resource` en repartant de zéro) — vrai CRUD Prisma, guards, vérification de propriété, **et branchés côté Frontend** :
+
+- `application` : candidatures de l'utilisateur (`GET/POST/PATCH/DELETE /application`), owner direct (`user_id`, `assertOwnership`). Empêche la double candidature à une même offre (vérif service, pas de contrainte DB). Consommé par `Candidatures.tsx`/`CandidatureDetail.tsx` et par le bouton "Postuler" de `OfferDetail.tsx`.
+- `interview` : entretiens liés à une candidature (owner indirect, via `Application.user_id`). Consommé par `Entretiens.tsx`/`EntretienDetail.tsx`.
+- `document` : CV/lettres de motivation (owner direct). Consommé par `Documents.tsx`, `DocumentEdit.tsx`, `DocumentPreview.tsx`.
+- `dashboard` : `GET /dashboard/stats` (compteurs candidatures actives / entretiens à venir / offres dispo). Consommé par les tuiles de `Dashboard.tsx`.
+- `comment` : commentaires sur une publication (owner direct). Consommé par `PublicationDetail.tsx`.
+- `skill` : compétences de l'utilisateur (`User_skill`, flat — le regroupement par catégorie était une maquette Front). Consommé par `ProfileSkillsEdit.tsx`.
+
+Le modèle `User` porte aussi désormais `headline`/`bio`/`location`/`phone`/`website`/`linkedin`/`github` (`PATCH /user/profile`) — l'écart "`MOCK_PROFILE_DETAILS` sans équivalent Backend" documenté aux audits v2-v4 est **résolu**, branché par `ProfileEdit.tsx`/`ProfileContactEdit.tsx`.
 
 ### Module `connection` — mise en relation entre membres
 
@@ -135,12 +146,29 @@ Ce module a son test unitaire, `job_offering.service.spec.ts` : instancie le ser
 
 ## État d'avancement
 
-Modules réellement câblés (après audit v3, les scaffolds ont été supprimés) : `auth`, `user`, `company`, `notification`, `role`, `job_offering`, `publication`. `notification`, `role`, `user`, `publication` sont protégés par `@UseGuards(AuthGuard)` au niveau classe ; `company` et `job_offering` le sont au niveau méthode, avec `findAll`/`findOne` publics sur les deux. Vérification de propriété présente sur `user` (`_assertSelf`), `notification` (`target_user_id`), `connection`, `publication` (`user_id`), `job_offering` et `company` (entreprise de l'`Employment` courant) ; **absente** sur `role` (auth seule) — ne pas supposer qu'un endpoint gère l'autorisation fine sans avoir lu le service.
+Modules réellement câblés (audit v5) : `auth`, `user`, `company`, `notification`, `role`, `job_offering`, `publication`, `application`, `comment`, `dashboard`, `document`, `interview`, `skill`, `connection`, `job_category`. `notification`, `role`, `user`, `publication`, `application`, `comment`, `document`, `interview`, `skill` sont protégés par `@UseGuards(AuthGuard)` au niveau classe ; `company` et `job_offering` le sont au niveau méthode, avec `findAll`/`findOne` publics sur les deux (comme `job_category`). Vérification de propriété présente sur `user` (`_assertSelf`), `notification` (`target_user_id`), `connection`, `publication`/`application`/`document`/`comment` (`user_id`, direct ou via `utils/ownership.ts#assertOwnership`), `interview` (via la candidature), `job_offering` et `company` (entreprise de l'`Employment` courant) ; **absente** sur `role` (auth seule) — ne pas supposer qu'un endpoint gère l'autorisation fine sans avoir lu le service.
+
+**Dette identifiée à l'audit v5, non traitée consciemment** : `User.deleted_at` existe en base mais n'est filtré nulle part (`findAll`/`findOneSafeOrThrow`) et `UserService.delete()` fait un vrai `delete` plutôt qu'un soft-delete — contrairement à `job_offering`/`publication`/`comment` qui respectent la convention. À trancher (exploiter ou retirer la colonne) dans un lot dédié, pas mélangé à un refactor plus large.
+
+**Composeur de post (Frontend) — image jointe (septembre 2026) :** `Publication.image_url` est passé de `@db.Text` (64 Ko) à `@db.LongText`, même contrat que `Company.logo_url`/`banner_url` — le composeur (`CreatePublication.tsx`) envoie une data URL (`fileToPostImageDataUrl`, redimensionnée sans recadrage) qui dépassait la limite `TEXT`. `CreatePublicationDto` accepte désormais `image_url` (optionnel). Migration `20260912100000_publication_image_url_to_longtext`.
+
+**Icônes d'entreprises (septembre 2026) :** `prisma:seed:company-logos` attribue un logo à initiales à toute entreprise sans logo réel — généré **hors ligne** avec `@dicebear/core`/`@dicebear/collection` (style `initials`, packages ESM-only donc chargés via `import()` dynamique dans le script CommonJS), stocké en data URI SVG directement dans `Company.logo_url` (pas d'appel à un service d'avatars distant à l'affichage, contrairement à `seed-avatars.js#randomuser.me` pour les utilisateurs). Idempotent : ne régénère que `NULL` ou un logo déjà posé par ce script, jamais un logo réellement uploadé.
+
+**Candidatures de démonstration (septembre 2026) :** `prisma:seed:applications` répartit des candidatures (comptes démo + admin/admin2) sur toutes les offres avec un volume variable (cycle 0 à 7 par offre) — sert à voir coexister le badge Frontend « Premier candidat » (`OfferCard.tsx`, seuil `applicantCount < 5`) et des offres qui l'ont dépassé, plutôt que d'avoir un badge systématiquement affiché faute de données. Idempotent : purge d'abord les candidatures de ce pool de comptes avant de les réinsérer.
 
 ## Sécurité
 
 - `.env` contient des secrets (connexion DB, clés JWT) — ne jamais l'afficher, le logger ou le committer.
 - Voir la section « Sécurité — autorisation sur l'API » en tête de fichier : `AuthGuard` est maintenant posé partout ; reste à faire un `RolesGuard` / une vérification de propriété généralisée si besoin en production.
+
+### Audit des dépendances (`npm audit`, septembre 2026)
+
+`npm audit fix` (non cassant) exécuté : **22 → 13 vulnérabilités**. Les 13 restantes nécessitent toutes `--force` (changement majeur) et n'ont pas été appliquées :
+
+- **`mariadb` (nested sous `@prisma/adapter-mariadb`) — le seul qui tourne réellement en prod** (c'est l'adaptateur DB de l'app). Fuite du mot de passe en clair malgré `ssl: true`, injection SQL possible sous certains charsets (`big5`/`gbk`/`sjis`/`cp932`/`gb18030`, pas ceux utilisés ici). **Pas de correctif disponible en amont** pour l'instant — à surveiller, rien à faire côté projet tant que ça n'existe pas.
+- `mysql2` (top-level, `^2.3.3`) — correctif en 3.24.4, mais version gardée à dessein (cf. plus haut, utilisée uniquement par les scripts de seed) ; `--force` casserait ce choix.
+- `multer` (via `@nestjs/platform-express`) — ferait redescendre `@nestjs/core` en 7.5.5 ; de toute façon **non utilisé** dans le code (`grep` ne trouve aucun `multer`/`FileInterceptor`).
+- Le reste (`vitest`/`@vitest/mocker`, `valibot`, `deepmerge-ts`, `@prisma/dev`, `@prisma/config`, `hono`) : outillage interne du CLI `prisma`/`vitest` (devDependencies, jamais embarqué dans l'app qui tourne).
 
 ## Workflow Git
 
@@ -156,4 +184,4 @@ Projet solo désormais, plus de suivi par tickets (l'ancienne convention YouTrac
 - `npm run lint` — ESLint avec `--fix`
 - `npm run format` — Prettier sur `src/` et `test/`
 - `npm run test` / `test:watch` / `test:cov` / `test:e2e` — Vitest
-- `npm run prisma:seed` — companies + offres de démo · `prisma:seed:categories` — référentiel `Job_category` (13 lignes, idempotent) · `prisma:seed:connections` / `prisma:seed:avatars` — voir modules concernés · `prisma:seed:admin` — (ré)insère un 2e compte de login `admin2@jobtrack.local` (compte utilisateur ordinaire, pas de privilège ; email/nom/hash surchargeables par env `ADMIN2_*`)
+- `npm run prisma:seed` — companies + offres de démo · `prisma:seed:categories` — référentiel `Job_category` (13 lignes, idempotent) · `prisma:seed:connections` / `prisma:seed:avatars` — voir modules concernés · `prisma:seed:admin` — (ré)insère un 2e compte de login `admin2@jobtrack.local` (compte utilisateur ordinaire, pas de privilège ; email/nom/hash surchargeables par env `ADMIN2_*`) · `prisma:seed:company-logos` — logos à initiales (DiceBear, hors ligne) pour les entreprises sans logo · `prisma:seed:applications` — candidatures de démo réparties sur les offres (test du badge « Premier candidat »)
