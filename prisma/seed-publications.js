@@ -122,6 +122,37 @@ const posts = [
     38,
     96,
   ],
+  // Volume supplémentaire (pas de contenu narratif particulier) : sert à
+  // tester le rendu de l'accueil invité sur les paliers hauts de
+  // `PUBLICATIONS_PREVIEW_TIERS` (grands écrans) sans dépendre d'un jeu de
+  // données trop restreint.
+  [3, "ACTU", "Retour d'expérience meetup DevOps", "Bonne session hier sur les pipelines CI/CD, plein de retours concrets sur GitLab CI vs GitHub Actions.", 12, 100],
+  [4, "ANNONCE", "Recherche stage data/BI - printemps", "Étudiante en M1 data, je cherche un stage data/BI à partir de mars sur Nice / Sophia / remote. Dispo pour échanger en MP.", 9, 110],
+  [0, "ARTICLE", "5 questions à se poser avant d'accepter une offre", "Salaire à part, ce qui compte vraiment : l'équipe, le produit, l'autonomie, le télétravail réel, et la trajectoire de la boîte.", 31, 120],
+  [1, "ACTU", "Retour sur un an de télétravail full remote", "Un an après le passage en full remote : plus de deep work, un peu moins de sérendipité d'équipe. Le bilan reste largement positif.", 22, 130],
+  [2, "ANNONCE", "Recherche dev mobile React Native", "Notre équipe cherche un·e dev React Native (2+ ans) pour une appli déjà en prod, CDI Nice ou remote.", 17, 140],
+  [3, "ACTU", "Ce que j'ai appris en relisant du code d'il y a 2 ans", "Verdict sans appel : trop de commentaires inutiles, pas assez de tests. Bon rappel avant de se relancer sur un vieux projet.", 8, 150],
+  [4, "ARTICLE", "Se former en autodidacte : ce qui a marché pour moi", "Un projet perso concret bat toujours une formation théorique sans mise en pratique. Le vrai déclic est venu en cassant des choses.", 44, 160],
+  [0, "ACTU", "Petit bilan du salon emploi tech de la semaine", "Beaucoup de stands DevOps/cloud cette année, moins de front pur. Le marché semble se déplacer doucement.", 15, 170],
+  [1, "ANNONCE", "On recrute un·e alternant·e QA", "Poste d'alternant·e QA/test à pourvoir dès septembre, encadrement assuré, stack Cypress + Playwright.", 11, 180],
+  [2, "ARTICLE", "Pourquoi j'ai arrêté de candidater en masse", "Dix candidatures ciblées valent mieux que cent envoyées au hasard. La qualité de la lettre change tout au taux de réponse.", 29, 190],
+  [3, "ACTU", "Retour sur la conf React Paris de cette année", "Beaucoup de contenu sur les Server Components et le streaming SSR, moins de hype pure cette édition, plus de retours d'expérience prod.", 33, 200],
+  // Volume supplémentaire (idem `seed.js`) : couvre les très grands écrans
+  // (4K portrait...) sans dépendre d'un jeu de données trop restreint.
+  [4, "ARTICLE", "Ce qui a vraiment changé depuis mon premier CDI", "Moins de stress sur les détails, plus d'attention portée aux vraies priorités. L'expérience aide surtout à savoir où NE PAS aller trop vite.", 26, 210],
+  [0, "ANNONCE", "Recherche dev backend Go - mission courte", "Mission de 6 semaines pour renforcer une équipe backend Go sur un projet fintech, remote possible.", 18, 220],
+  [1, "ACTU", "Bilan de notre premier hackathon interne", "Deux jours, six équipes, une appli de covoiturage interne sortie du lot. On recommence l'an prochain.", 21, 230],
+  [2, "ARTICLE", "Le syndrome de l'imposteur ne disparaît jamais totalement", "Il change juste de forme avec l'expérience. En parler ouvertement avec son équipe aide énormément.", 47, 240],
+  [3, "ACTU", "Retour d'expérience : passer de Jest à Vitest", "Migration terminée sur trois repos, temps de test divisé par deux, quelques mocks à réécrire.", 14, 250],
+  [4, "ANNONCE", "Recherche mentor en développement front", "Junior en autodidaxie, je cherche un·e mentor pour un point mensuel sur mon code. Café virtuel bienvenu.", 20, 260],
+  [0, "ARTICLE", "Ce que je regarde vraiment sur un CV", "Moins les intitulés de poste, plus les projets concrets et ce que la personne en dit en entretien.", 36, 270],
+  [1, "ACTU", "On a doublé notre couverture de tests en un trimestre", "Objectif fixé en janvier atteint : passage de 40% à 82% de couverture sur le service principal.", 25, 280],
+  [2, "ANNONCE", "Recherche designer UI freelance - refonte app", "Refonte de l'interface d'une appli mobile B2C, mission de 2 mois, budget à discuter selon profil.", 16, 290],
+  [3, "ARTICLE", "Pourquoi j'ai arrêté les todo-lists infinies", "Trois tâches par jour maximum, le reste attend. Contre-intuitif mais radicalement plus efficace pour moi.", 39, 300],
+  [4, "ACTU", "Retour sur notre premier sprint en 4 jours", "Test d'un rythme de travail sur 4 jours pendant un mois : productivité stable, moral en nette hausse.", 30, 310],
+  [0, "ANNONCE", "Recherche alternant·e développement full-stack", "Poste d'alternance dès septembre, stack React/NestJS, encadrement par un senior dédié.", 13, 320],
+  [1, "ARTICLE", "Ce que j'aurais aimé savoir sur le télétravail", "L'isolement se travaille autant que l'autonomie. Un rituel de café virtuel a changé la donne pour notre équipe.", 28, 330],
+  [2, "ACTU", "Petit bilan de notre veille technique hebdo", "Quinze minutes le vendredi, un article partagé par personne. Simple, mais ça tient dans la durée.", 17, 340],
 ];
 
 async function main() {
