@@ -11,7 +11,11 @@ import {
   Patch,
   HttpCode,
   ForbiddenException,
+  Res,
+  Headers,
+  HttpStatus,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { SafeUser } from './interface/safe-user';
@@ -22,6 +26,7 @@ import { UpdateLanguageDto } from './dto/update-language.dto';
 import { UpdateAvatarDto } from './dto/update-avatar.dto';
 import { UpdateBannerDto } from './dto/update-banner.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { matchesETag } from '../utils/etag';
 
 @UseGuards(AuthGuard)
 @Controller('user')
@@ -34,12 +39,33 @@ export class UserController {
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<SafeUser> {
+  async findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Headers('if-none-match') ifNoneMatch: string | undefined,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<SafeUser | undefined> {
+    const etag = await this.userService.getDetailETag(id);
+    if (etag && matchesETag(ifNoneMatch, etag)) {
+      response.status(HttpStatus.NOT_MODIFIED);
+      return;
+    }
+    if (etag) {
+      response.setHeader('ETag', etag);
+    }
     return this.userService.findOneSafeOrThrow(id);
   }
 
   @Get()
-  async findAll(): Promise<SafeUser[]> {
+  async findAll(
+    @Headers('if-none-match') ifNoneMatch: string | undefined,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<SafeUser[] | undefined> {
+    const etag = await this.userService.getListETag();
+    if (matchesETag(ifNoneMatch, etag)) {
+      response.status(HttpStatus.NOT_MODIFIED);
+      return;
+    }
+    response.setHeader('ETag', etag);
     return await this.userService.findAll();
   }
 

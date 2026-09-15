@@ -8,6 +8,7 @@ import { Prisma } from '../../prisma/generated/prisma/client';
 import { Interview_interview_type } from '../../prisma/generated/prisma/enums';
 import { CreateInterviewDto } from './dto/create-interview.dto';
 import { UpdateInterviewDto } from './dto/update-interview.dto';
+import { buildETag } from '../utils/etag';
 
 /** Ligne `Interview` chargée ici (candidature -> offre -> entreprise). */
 type InterviewRow = Prisma.InterviewGetPayload<{
@@ -62,11 +63,33 @@ export class InterviewService {
       mode: isPresentiel ? 'presentiel' : 'visio',
       scheduledAt: scheduledAt.toISOString(),
       date: DATE_FMT.format(scheduledAt),
-      isUpcoming: scheduledAt.getTime() > Date.now(),
+      // Pas de booléen `isUpcoming` précalculé ici : figé dans une réponse
+      // mise en cache (ETag), il ne se périmerait qu'aux vraies mutations de
+      // données, jamais au simple écoulement du temps. Le Front le recalcule
+      // à chaque lecture (`interviews.api.ts`) à partir de `scheduledAt`.
       notes: row.notes ?? null,
       visioLink: isPresentiel ? null : (row.notes ?? null),
       location: isPresentiel ? (row.notes ?? null) : null,
     };
+  }
+
+  /** Signal léger pour l'ETag de `GET /interview` — scopé via la candidature, comme `findAllForUser`. */
+  async getListETag(userId: number): Promise<string> {
+    const agg = await this.prisma.interview.aggregate({
+      where: { application: { user_id: userId } },
+      _max: { updated_at: true },
+      _count: { _all: true },
+    });
+    return buildETag(userId, agg._count._all, agg._max.updated_at);
+  }
+
+  /** `null` si l'entretien n'existe pas ou que sa candidature n'appartient pas à `userId`. */
+  async getDetailETag(id: number, userId: number): Promise<string | null> {
+    const row = await this.prisma.interview.findFirst({
+      where: { id, application: { user_id: userId } },
+      select: { updated_at: true },
+    });
+    return row ? buildETag(id, row.updated_at) : null;
   }
 
   async findAllForUser(userId: number) {

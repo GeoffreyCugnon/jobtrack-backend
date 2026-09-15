@@ -116,7 +116,7 @@ export class AuthController {
     const { accessToken, refreshToken } =
       await this.authService.generateJwts(user);
     //udpate user.refresh in db
-    await this.userService.update(user.id, { refreshToken });
+    await this.userService.updateInternal(user.id, { refreshToken });
     //put refresh in cookie
     this.authService.insertTokenCookie(response, refreshToken);
 
@@ -129,7 +129,9 @@ export class AuthController {
     @Req() request: IRequestWithPayload,
     @Res({ passthrough: true }) response: Response,
   ): Promise<{ message: string }> {
-    await this.userService.update(request.user.id, { refreshToken: null });
+    await this.userService.updateInternal(request.user.id, {
+      refreshToken: null,
+    });
     this.authService.clearTokenCookie(response);
 
     return { message: 'Déconnexion réussie' };
@@ -161,7 +163,7 @@ export class AuthController {
     const hashedToken = await this.authService.hash(token);
     const expires = new Date(Date.now() + 15 * 60 * 1000);
 
-    await this.userService.update(user.id, {
+    await this.userService.updateInternal(user.id, {
       resetPasswordToken: hashedToken,
       resetPasswordExpires: expires,
     });
@@ -195,7 +197,7 @@ export class AuthController {
       }
 
       const hashedPassword = await this.authService.hash(body.newPassword);
-      await this.userService.update(user.id, {
+      await this.userService.updateInternal(user.id, {
         password: hashedPassword,
         resetPasswordToken: null,
         resetPasswordExpires: null,
@@ -225,7 +227,9 @@ export class AuthController {
       }
 
       const hashedPassword = await this.authService.hash(body.newPassword);
-      await this.userService.update(user.id, { password: hashedPassword });
+      await this.userService.updateInternal(user.id, {
+        password: hashedPassword,
+      });
 
       return { message: 'Mot de passe mis à jour avec succès' };
     } catch (error) {

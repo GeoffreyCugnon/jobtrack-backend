@@ -62,3 +62,79 @@ describe('PublicationService — ownership on update/remove', () => {
     });
   });
 });
+
+describe('PublicationService — ETag', () => {
+  it('combines the publication and comment aggregates for the list ETag', async () => {
+    const prisma = {
+      publication: {
+        aggregate: vi.fn().mockResolvedValue({
+          _count: { _all: 4 },
+          _max: { updated_at: new Date('2026-09-10T00:00:00Z') },
+        }),
+      },
+      comment: {
+        aggregate: vi.fn().mockResolvedValue({
+          _count: { _all: 9 },
+          _max: { created_at: new Date('2026-09-09T00:00:00Z') },
+        }),
+      },
+    } as any;
+
+    const service = new PublicationService(prisma);
+    const etag = await service.getListETag();
+
+    expect(prisma.publication.aggregate).toHaveBeenCalledWith({
+      where: { is_public: true, deleted_at: null },
+      _max: { updated_at: true },
+      _count: { _all: true },
+    });
+    expect(prisma.comment.aggregate).toHaveBeenCalledWith({
+      where: { publication: { is_public: true, deleted_at: null } },
+      _max: { created_at: true },
+      _count: { _all: true },
+    });
+    expect(etag).toMatch(/^".+"$/);
+  });
+
+  it('changes the list ETag when only a comment is added (commenter ne touche pas publication.updated_at)', async () => {
+    const prisma = {
+      publication: {
+        aggregate: vi.fn().mockResolvedValue({
+          _count: { _all: 4 },
+          _max: { updated_at: new Date('2026-09-10T00:00:00Z') },
+        }),
+      },
+      comment: {
+        aggregate: vi
+          .fn()
+          .mockResolvedValueOnce({
+            _count: { _all: 9 },
+            _max: { created_at: new Date('2026-09-09T00:00:00Z') },
+          })
+          .mockResolvedValueOnce({
+            _count: { _all: 10 },
+            _max: { created_at: new Date('2026-09-11T00:00:00Z') },
+          }),
+      },
+    } as any;
+
+    const service = new PublicationService(prisma);
+    const first = await service.getListETag();
+    const second = await service.getListETag();
+
+    expect(first).not.toBe(second);
+  });
+
+  it('returns null for the detail ETag of a missing (or soft-deleted) publication', async () => {
+    const prisma = {
+      publication: { findFirst: vi.fn().mockResolvedValue(null) },
+      comment: { aggregate: vi.fn() },
+    } as any;
+
+    const service = new PublicationService(prisma);
+    const etag = await service.getDetailETag(999);
+
+    expect(prisma.comment.aggregate).not.toHaveBeenCalled();
+    expect(etag).toBeNull();
+  });
+});

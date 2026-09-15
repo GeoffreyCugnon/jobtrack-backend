@@ -8,6 +8,7 @@ import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Company } from '../../prisma/generated/prisma/client';
+import { buildETag } from '../utils/etag';
 
 @Injectable()
 export class CompanyService {
@@ -68,6 +69,62 @@ export class CompanyService {
       orderBy: { created_at: 'desc' },
     });
     return employments.map((employment) => employment.company);
+  }
+
+  /**
+   * Signal léger pour l'ETag de `GET /company` : `logo_url`/`banner_url` sont
+   * des data URI `LongText` potentiellement volumineuses, donc l'agrégat
+   * évite de les re-sérialiser/re-transférer quand rien n'a changé.
+   */
+  async getListETag(): Promise<string> {
+    const agg = await this.prisma.company.aggregate({
+      _max: { updated_at: true },
+      _count: { _all: true },
+    });
+    return buildETag(agg._count._all, agg._max.updated_at);
+  }
+
+  /** `null` si l'entreprise n'existe pas. */
+  async getDetailETag(id: number): Promise<string | null> {
+    const row = await this.prisma.company.findUnique({
+      where: { id },
+      select: { updated_at: true },
+    });
+    return row ? buildETag(id, row.updated_at) : null;
+  }
+
+  /** `null` si l'utilisateur n'a pas d'entreprise courante — même règle que `findMine()`. */
+  async getMineETag(userId: number): Promise<string | null> {
+    const employment = await this.prisma.employment.findFirst({
+      where: { user_id: userId, is_current: true },
+      select: { company: { select: { id: true, updated_at: true } } },
+    });
+    return employment
+      ? buildETag(employment.company.id, employment.company.updated_at)
+      : null;
+  }
+
+  /**
+   * Signal léger pour `GET /company/mine/all` : reflète à la fois l'ensemble
+   * des entreprises gérées (ajout/retrait d'`Employment`) et leurs propres
+   * changements (`Company.update()` ne touche jamais `Employment`).
+   */
+  async getMineAllETag(userId: number): Promise<string> {
+    const employments = await this.prisma.employment.findMany({
+      where: { user_id: userId },
+      select: { company_id: true },
+    });
+    const companyIds = employments
+      .map((e) => e.company_id)
+      .sort((a, b) => a - b);
+    if (companyIds.length === 0) {
+      return buildETag(userId, 0);
+    }
+    const agg = await this.prisma.company.aggregate({
+      where: { id: { in: companyIds } },
+      _max: { updated_at: true },
+    });
+    return buildETag(userId, companyIds.join(','), agg._max.updated_at);
   }
 
   findAll(): Promise<Company[]> {

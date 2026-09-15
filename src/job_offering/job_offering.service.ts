@@ -7,7 +7,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma } from '../../prisma/generated/prisma/client';
 import { CreateJobOfferingDto } from './dto/create-job_offering.dto';
 import { UpdateJobOfferingDto } from './dto/update-job_offering.dto';
-import { formatRelativeFr, hoursSince } from '../utils/relative-time';
+import { buildETag } from '../utils/etag';
 
 /** Ligne `job_offering` telle que chargée par `findAll()`/`findOne()` (relations incluses). */
 type OfferRow = Prisma.Job_offeringGetPayload<{
@@ -145,8 +145,6 @@ export class JobOfferingService {
   }
 
   private toOfferDto(row: OfferRow) {
-    const hoursAgo = hoursSince(row.created_at);
-
     return {
       id: row.id,
       role: row.title,
@@ -156,8 +154,11 @@ export class JobOfferingService {
       companyId: row.company_id,
       companyLogoUrl: row.company?.logo_url ?? undefined,
       location: row.company?.address ?? 'France',
-      timeAgo: formatRelativeFr(row.created_at),
-      postedHoursAgo: hoursAgo,
+      // Pas de `timeAgo`/`postedHoursAgo` précalculés ici : figés dans une
+      // réponse mise en cache (ETag), ils ne se périmeraient qu'aux vraies
+      // mutations de données, jamais au simple écoulement du temps. Le Front
+      // les recalcule à chaque lecture (`offers.api.ts`) à partir de `createdAt`.
+      createdAt: row.created_at.toISOString(),
       category: this.inferCategory(row.title),
       workMode: this.inferWorkMode(row.title),
       applicantCount: row.application?.length ?? 0,
@@ -187,6 +188,61 @@ export class JobOfferingService {
         company_id: employment.company_id,
       },
     });
+  }
+
+  /**
+   * Signal léger pour l'ETag de `GET /job-offering` : agrégat plutôt qu'un
+   * hash du payload complet, calculé avant tout `findMany()`/mapping coûteux
+   * pour pouvoir court-circuiter en 304 côté contrôleur. Combine l'agrégat
+   * `job_offering` avec un agrégat `application` (candidatures sur des offres
+   * non supprimées) : `toOfferDto().applicantCount` dérive de cette relation
+   * sans jamais toucher `job_offering.updated_at` (postuler ne met pas à jour
+   * l'offre) — sans ce second agrégat, l'ETag resterait figé indéfiniment
+   * après une nouvelle candidature.
+   */
+  async getListETag(): Promise<string> {
+    const [offers, applications] = await Promise.all([
+      this.prisma.job_offering.aggregate({
+        where: { deleted_at: null },
+        _max: { updated_at: true },
+        _count: { _all: true },
+      }),
+      this.prisma.application.aggregate({
+        where: { job_offering: { deleted_at: null } },
+        _max: { created_at: true },
+        _count: { _all: true },
+      }),
+    ]);
+    return buildETag(
+      offers._count._all,
+      offers._max.updated_at,
+      applications._count._all,
+      applications._max.created_at,
+    );
+  }
+
+  /** `null` si l'offre n'existe pas (ou est soft-supprimée) — même règle que `findOne()`. */
+  async getDetailETag(id: number): Promise<string | null> {
+    const row = await this.prisma.job_offering.findFirst({
+      where: { id, deleted_at: null },
+      select: { updated_at: true },
+    });
+    if (!row) {
+      return null;
+    }
+    // Même raison qu'au-dessus : `applicantCount` dérive de `application`,
+    // pas de `job_offering.updated_at`.
+    const applications = await this.prisma.application.aggregate({
+      where: { job_offering_id: id },
+      _max: { created_at: true },
+      _count: { _all: true },
+    });
+    return buildETag(
+      id,
+      row.updated_at,
+      applications._count._all,
+      applications._max.created_at,
+    );
   }
 
   async findAll() {

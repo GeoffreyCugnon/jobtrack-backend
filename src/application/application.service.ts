@@ -10,6 +10,7 @@ import { Application_status } from '../../prisma/generated/prisma/enums';
 import { CreateApplicationDto } from './dto/create-application.dto';
 import { UpdateApplicationDto } from './dto/update-application.dto';
 import { assertOwnership } from '../utils/ownership';
+import { buildETag } from '../utils/etag';
 
 /** Ligne `Application` chargée ici (offre + entreprise + entretiens). */
 type ApplicationRow = Prisma.ApplicationGetPayload<{
@@ -37,8 +38,19 @@ export class ApplicationService {
 
   private toDto(row: ApplicationRow) {
     const createdAt = new Date(row.created_at);
-    const hasUpcomingInterview = row.interview.some(
-      (interview) => new Date(interview.scheduled_at).getTime() > Date.now(),
+    // Le plus tardif des entretiens planifiés détermine si l'un d'eux est à
+    // venir (MAX(scheduled_at) > maintenant <=> au moins un entretien à
+    // venir). Champ brut plutôt qu'un booléen précalculé : un booléen figé
+    // dans une réponse mise en cache (ETag) ne se périmerait qu'aux vraies
+    // mutations de données, jamais au simple écoulement du temps — le Front
+    // recalcule `hasUpcomingInterview`/`statusLabel` à chaque lecture
+    // (`applications.api.ts`) à partir de cette valeur brute.
+    const latestInterviewScheduledAt = row.interview.reduce<Date | null>(
+      (latest, interview) => {
+        const scheduledAt = new Date(interview.scheduled_at);
+        return !latest || scheduledAt > latest ? scheduledAt : latest;
+      },
+      null,
     );
 
     return {
@@ -47,16 +59,64 @@ export class ApplicationService {
       company: row.job_offering?.company?.name ?? 'Entreprise',
       role: row.job_offering?.title ?? 'Poste',
       status: row.status,
-      // « Entretien prévu » prime sur le statut brut tant qu'un entretien est à
-      // venir (c'est l'info utile pour le candidat) ; sinon libellé du statut.
-      statusLabel: hasUpcomingInterview
-        ? 'Entretien prévu'
-        : STATUS_LABEL[row.status],
-      hasUpcomingInterview,
+      statusLabel: STATUS_LABEL[row.status],
       interviewsCount: row.interview.length,
+      latestInterviewScheduledAt: latestInterviewScheduledAt?.toISOString() ?? null,
       appliedDate: createdAt.toLocaleDateString('fr-FR'),
       createdAt: createdAt.toISOString(),
     };
+  }
+
+  /**
+   * Signal léger pour l'ETag de `GET /application` — scopé à `userId`, comme
+   * `findAllForUser`. Combine l'agrégat `application` avec un agrégat
+   * `interview` : `hasUpcomingInterview`/`interviewsCount`/`statusLabel`
+   * dérivent de cette relation sans jamais toucher `application.updated_at`
+   * (planifier un entretien ne met pas à jour la candidature).
+   */
+  async getListETag(userId: number): Promise<string> {
+    const [applications, interviews] = await Promise.all([
+      this.prisma.application.aggregate({
+        where: { user_id: userId },
+        _max: { updated_at: true },
+        _count: { _all: true },
+      }),
+      this.prisma.interview.aggregate({
+        where: { application: { user_id: userId } },
+        _max: { updated_at: true },
+        _count: { _all: true },
+      }),
+    ]);
+    return buildETag(
+      userId,
+      applications._count._all,
+      applications._max.updated_at,
+      interviews._count._all,
+      interviews._max.updated_at,
+    );
+  }
+
+  /** `null` si la candidature n'existe pas ou n'appartient pas à `userId`. */
+  async getDetailETag(id: number, userId: number): Promise<string | null> {
+    const row = await this.prisma.application.findFirst({
+      where: { id, user_id: userId },
+      select: { updated_at: true },
+    });
+    if (!row) {
+      return null;
+    }
+    // Même raison qu'au-dessus : `hasUpcomingInterview` dérive de `interview`.
+    const interviews = await this.prisma.interview.aggregate({
+      where: { application_id: id },
+      _max: { updated_at: true },
+      _count: { _all: true },
+    });
+    return buildETag(
+      id,
+      row.updated_at,
+      interviews._count._all,
+      interviews._max.updated_at,
+    );
   }
 
   async findAllForUser(userId: number) {

@@ -29,3 +29,26 @@ describe('SkillService.replaceForUser', () => {
     });
   });
 });
+
+describe('SkillService.getListETag', () => {
+  it('scopes the aggregate to userId', async () => {
+    const prisma = {
+      user_skill: {
+        aggregate: vi.fn().mockResolvedValue({
+          _count: { _all: 3 },
+          _max: { updated_at: new Date('2026-09-10T00:00:00Z') },
+        }),
+      },
+    } as any;
+
+    const service = new SkillService(prisma);
+    const etag = await service.getListETag(7);
+
+    expect(prisma.user_skill.aggregate).toHaveBeenCalledWith({
+      where: { user_id: 7 },
+      _max: { updated_at: true },
+      _count: { _all: true },
+    });
+    expect(etag).toMatch(/^".+"$/);
+  });
+});

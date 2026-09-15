@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma } from '../../prisma/generated/prisma/client';
+import { buildETag } from '../utils/etag';
 
 /** Champs d'utilisateur exposés dans une relation (jamais de hash / jetons). */
 const CONNECTION_USER_SELECT = {
@@ -69,6 +70,19 @@ export class ConnectionService {
       },
     });
     return { status: 'pending_out' as const };
+  }
+
+  /** Signal léger pour l'ETag de `GET /connection` — même `where` que `list()`. */
+  async getListETag(meId: number): Promise<string> {
+    const agg = await this.prisma.connection.aggregate({
+      where: {
+        OR: [{ user_action_id: meId }, { user_receiver_id: meId }],
+        status: { in: ['PENDING', 'ACCEPTED'] },
+      },
+      _max: { updated_at: true },
+      _count: { _all: true },
+    });
+    return buildETag(meId, agg._count._all, agg._max.updated_at);
   }
 
   /** Le réseau de `meId` : relations acceptées, invitations reçues et envoyées. */

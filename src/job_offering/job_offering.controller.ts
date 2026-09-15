@@ -8,12 +8,17 @@ import {
   Delete,
   UseGuards,
   Req,
+  Res,
+  Headers,
+  HttpStatus,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { JobOfferingService } from './job_offering.service';
 import { CreateJobOfferingDto } from './dto/create-job_offering.dto';
 import { UpdateJobOfferingDto } from './dto/update-job_offering.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import type { IRequestWithPayload } from '../auth/interface';
+import { matchesETag } from '../utils/etag';
 
 @Controller('job-offering')
 export class JobOfferingController {
@@ -32,12 +37,33 @@ export class JobOfferingController {
   }
 
   @Get()
-  findAll() {
+  async findAll(
+    @Headers('if-none-match') ifNoneMatch: string | undefined,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const etag = await this.jobOfferingService.getListETag();
+    if (matchesETag(ifNoneMatch, etag)) {
+      response.status(HttpStatus.NOT_MODIFIED);
+      return;
+    }
+    response.setHeader('ETag', etag);
     return this.jobOfferingService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(
+    @Param('id') id: string,
+    @Headers('if-none-match') ifNoneMatch: string | undefined,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const etag = await this.jobOfferingService.getDetailETag(+id);
+    if (etag && matchesETag(ifNoneMatch, etag)) {
+      response.status(HttpStatus.NOT_MODIFIED);
+      return;
+    }
+    if (etag) {
+      response.setHeader('ETag', etag);
+    }
     return this.jobOfferingService.findOne(+id);
   }
 

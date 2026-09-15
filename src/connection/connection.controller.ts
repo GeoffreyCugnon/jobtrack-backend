@@ -9,11 +9,16 @@ import {
   Post,
   Req,
   UseGuards,
+  Res,
+  Headers,
+  HttpStatus,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { ConnectionService } from './connection.service';
 import { CreateConnectionDto } from './dto/create-connection.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import type { IRequestWithPayload } from '../auth/interface';
+import { matchesETag } from '../utils/etag';
 
 @UseGuards(AuthGuard)
 @Controller('connection')
@@ -21,7 +26,17 @@ export class ConnectionController {
   constructor(private readonly connectionService: ConnectionService) {}
 
   @Get()
-  list(@Req() request: IRequestWithPayload) {
+  async list(
+    @Req() request: IRequestWithPayload,
+    @Headers('if-none-match') ifNoneMatch: string | undefined,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const etag = await this.connectionService.getListETag(request.user.id);
+    if (matchesETag(ifNoneMatch, etag)) {
+      response.status(HttpStatus.NOT_MODIFIED);
+      return;
+    }
+    response.setHeader('ETag', etag);
     return this.connectionService.list(request.user.id);
   }
 

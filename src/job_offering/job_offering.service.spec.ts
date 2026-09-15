@@ -217,4 +217,147 @@ describe('JobOfferingService', () => {
       where: { id: 1 },
     });
   });
+
+  const offerAgg = (count: number, maxUpdatedAt: Date) => ({
+    _count: { _all: count },
+    _max: { updated_at: maxUpdatedAt },
+  });
+  const applicationAgg = (count: number, maxCreatedAt: Date | null) => ({
+    _count: { _all: count },
+    _max: { created_at: maxCreatedAt },
+  });
+
+  it('computes the list ETag from aggregates, not a findMany', async () => {
+    const prisma = {
+      job_offering: {
+        aggregate: vi
+          .fn()
+          .mockResolvedValue(offerAgg(3, new Date('2026-09-10T00:00:00Z'))),
+        findMany: vi.fn(),
+      },
+      application: {
+        aggregate: vi
+          .fn()
+          .mockResolvedValue(
+            applicationAgg(5, new Date('2026-09-09T00:00:00Z')),
+          ),
+      },
+    } as any;
+
+    const service = new JobOfferingService(prisma);
+    const etag = await service.getListETag();
+
+    expect(prisma.job_offering.aggregate).toHaveBeenCalledWith({
+      where: { deleted_at: null },
+      _max: { updated_at: true },
+      _count: { _all: true },
+    });
+    expect(prisma.application.aggregate).toHaveBeenCalledWith({
+      where: { job_offering: { deleted_at: null } },
+      _max: { created_at: true },
+      _count: { _all: true },
+    });
+    expect(prisma.job_offering.findMany).not.toHaveBeenCalled();
+    expect(etag).toMatch(/^".+"$/);
+  });
+
+  it('changes the list ETag when the offer aggregate changes', async () => {
+    const prisma = {
+      job_offering: {
+        aggregate: vi
+          .fn()
+          .mockResolvedValueOnce(offerAgg(3, new Date('2026-09-10T00:00:00Z')))
+          .mockResolvedValueOnce(offerAgg(4, new Date('2026-09-10T00:00:00Z'))),
+      },
+      application: {
+        aggregate: vi
+          .fn()
+          .mockResolvedValue(
+            applicationAgg(5, new Date('2026-09-09T00:00:00Z')),
+          ),
+      },
+    } as any;
+
+    const service = new JobOfferingService(prisma);
+    const first = await service.getListETag();
+    const second = await service.getListETag();
+
+    expect(first).not.toBe(second);
+  });
+
+  it('changes the list ETag when only the application aggregate changes (postuler ne touche pas job_offering.updated_at)', async () => {
+    const prisma = {
+      job_offering: {
+        aggregate: vi
+          .fn()
+          .mockResolvedValue(offerAgg(3, new Date('2026-09-10T00:00:00Z'))),
+      },
+      application: {
+        aggregate: vi
+          .fn()
+          .mockResolvedValueOnce(
+            applicationAgg(5, new Date('2026-09-09T00:00:00Z')),
+          )
+          .mockResolvedValueOnce(
+            applicationAgg(6, new Date('2026-09-11T00:00:00Z')),
+          ),
+      },
+    } as any;
+
+    const service = new JobOfferingService(prisma);
+    const first = await service.getListETag();
+    const second = await service.getListETag();
+
+    expect(first).not.toBe(second);
+  });
+
+  it('returns null for the detail ETag of a missing (or soft-deleted) offer', async () => {
+    const prisma = {
+      job_offering: {
+        findFirst: vi.fn().mockResolvedValue(null),
+      },
+      application: { aggregate: vi.fn() },
+    } as any;
+
+    const service = new JobOfferingService(prisma);
+    const etag = await service.getDetailETag(999);
+
+    expect(prisma.job_offering.findFirst).toHaveBeenCalledWith({
+      where: { id: 999, deleted_at: null },
+      select: { updated_at: true },
+    });
+    expect(prisma.application.aggregate).not.toHaveBeenCalled();
+    expect(etag).toBeNull();
+  });
+
+  it('changes the detail ETag when a new application comes in on the same offer', async () => {
+    const prisma = {
+      job_offering: {
+        findFirst: vi
+          .fn()
+          .mockResolvedValue({ updated_at: new Date('2026-09-10T00:00:00Z') }),
+      },
+      application: {
+        aggregate: vi
+          .fn()
+          .mockResolvedValueOnce(
+            applicationAgg(2, new Date('2026-09-09T00:00:00Z')),
+          )
+          .mockResolvedValueOnce(
+            applicationAgg(3, new Date('2026-09-11T00:00:00Z')),
+          ),
+      },
+    } as any;
+
+    const service = new JobOfferingService(prisma);
+    const first = await service.getDetailETag(1);
+    const second = await service.getDetailETag(1);
+
+    expect(prisma.application.aggregate).toHaveBeenCalledWith({
+      where: { job_offering_id: 1 },
+      _max: { created_at: true },
+      _count: { _all: true },
+    });
+    expect(first).not.toBe(second);
+  });
 });

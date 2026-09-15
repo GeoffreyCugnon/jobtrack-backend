@@ -6,6 +6,7 @@ import { Document_type } from '../../prisma/generated/prisma/enums';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
 import { assertOwnership } from '../utils/ownership';
+import { buildETag } from '../utils/etag';
 
 type DocumentRow = Prisma.DocumentGetPayload<object>;
 
@@ -24,6 +25,25 @@ export class DocumentService {
       updatedAt: updatedAt.toLocaleDateString('fr-FR'),
       updatedAtISO: updatedAt.toISOString(),
     };
+  }
+
+  /** Signal léger pour l'ETag de `GET /document` — même filtre (`type` optionnel) que `findAllForUser`. */
+  async getListETag(userId: number, type?: Document_type): Promise<string> {
+    const agg = await this.prisma.document.aggregate({
+      where: { user_id: userId, ...(type ? { type } : {}) },
+      _max: { updated_at: true },
+      _count: { _all: true },
+    });
+    return buildETag(userId, type, agg._count._all, agg._max.updated_at);
+  }
+
+  /** `null` si le document n'existe pas ou n'appartient pas à `userId`. */
+  async getDetailETag(id: number, userId: number): Promise<string | null> {
+    const row = await this.prisma.document.findFirst({
+      where: { id, user_id: userId },
+      select: { updated_at: true },
+    });
+    return row ? buildETag(id, row.updated_at) : null;
   }
 
   async findAllForUser(userId: number, type?: Document_type) {

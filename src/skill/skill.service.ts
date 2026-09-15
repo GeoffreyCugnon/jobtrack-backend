@@ -1,9 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { buildETag } from '../utils/etag';
 
 @Injectable()
 export class SkillService {
   constructor(private readonly prisma: PrismaService) {}
+
+  /** Signal léger pour l'ETag de `GET /skill` — scopé à `userId`, comme `listForUser`. */
+  async getListETag(userId: number): Promise<string> {
+    const agg = await this.prisma.user_skill.aggregate({
+      where: { user_id: userId },
+      _max: { updated_at: true },
+      _count: { _all: true },
+    });
+    return buildETag(userId, agg._count._all, agg._max.updated_at);
+  }
 
   /** Noms des compétences de l'utilisateur, triés alphabétiquement. */
   async listForUser(userId: number): Promise<string[]> {

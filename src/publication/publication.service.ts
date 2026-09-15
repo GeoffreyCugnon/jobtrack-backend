@@ -7,7 +7,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma } from '../../prisma/generated/prisma/client';
 import { CreatePublicationDto } from './dto/create-publication.dto';
 import { UpdatePublicationDto } from './dto/update-publication.dto';
-import { formatRelativeFr } from '../utils/relative-time';
+import { buildETag } from '../utils/etag';
 
 /** Ligne `Publication` telle que chargée ici (auteur + compteur de commentaires). */
 type PublicationRow = Prisma.PublicationGetPayload<{
@@ -43,7 +43,11 @@ export class PublicationService {
       imageUrl: row.image_url ?? null,
       type: row.type,
       createdAt: createdAt.toISOString(),
-      timeAgo: formatRelativeFr(createdAt),
+      // Pas de `timeAgo` précalculé ici : figé dans une réponse mise en
+      // cache (ETag), il ne se périmerait qu'aux vraies mutations de
+      // données, jamais au simple écoulement du temps. Le Front le
+      // recalcule à chaque lecture (`publications.api.ts`) à partir de
+      // `createdAt`.
       likesCount: row.likes_count,
       commentsCount: row._count.comment,
       // Pas de table de republications pour l'instant : valeur dérivée
@@ -56,6 +60,55 @@ export class PublicationService {
     return this.prisma.publication.create({
       data: { ...createPublicationDto, user_id: userId },
     });
+  }
+
+  /**
+   * Signal léger pour l'ETag de `GET /publication` : agrégat `publication`
+   * combiné à un agrégat `comment` (sur les publications visibles) —
+   * `commentsCount` dérive de `_count.comment` sans jamais toucher
+   * `publication.updated_at` (commenter ne met pas à jour la publication).
+   */
+  async getListETag(): Promise<string> {
+    const [publications, comments] = await Promise.all([
+      this.prisma.publication.aggregate({
+        where: { is_public: true, deleted_at: null },
+        _max: { updated_at: true },
+        _count: { _all: true },
+      }),
+      this.prisma.comment.aggregate({
+        where: { publication: { is_public: true, deleted_at: null } },
+        _max: { created_at: true },
+        _count: { _all: true },
+      }),
+    ]);
+    return buildETag(
+      publications._count._all,
+      publications._max.updated_at,
+      comments._count._all,
+      comments._max.created_at,
+    );
+  }
+
+  /** `null` si la publication n'existe pas (ou est soft-supprimée) — même règle que `findOne()`. */
+  async getDetailETag(id: number): Promise<string | null> {
+    const row = await this.prisma.publication.findFirst({
+      where: { id, deleted_at: null },
+      select: { updated_at: true },
+    });
+    if (!row) {
+      return null;
+    }
+    const comments = await this.prisma.comment.aggregate({
+      where: { publication_id: id },
+      _max: { created_at: true },
+      _count: { _all: true },
+    });
+    return buildETag(
+      id,
+      row.updated_at,
+      comments._count._all,
+      comments._max.created_at,
+    );
   }
 
   async findAll() {

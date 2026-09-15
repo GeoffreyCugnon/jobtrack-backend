@@ -8,12 +8,17 @@ import {
   Delete,
   UseGuards,
   Req,
+  Res,
+  Headers,
+  HttpStatus,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { PublicationService } from './publication.service';
 import { CreatePublicationDto } from './dto/create-publication.dto';
 import { UpdatePublicationDto } from './dto/update-publication.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import type { IRequestWithPayload } from '../auth/interface';
+import { matchesETag } from '../utils/etag';
 
 @Controller('publication')
 export class PublicationController {
@@ -33,12 +38,33 @@ export class PublicationController {
 
   // Le fil d'actus est visible sans être connecté (accueil invité).
   @Get()
-  findAll() {
+  async findAll(
+    @Headers('if-none-match') ifNoneMatch: string | undefined,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const etag = await this.publicationService.getListETag();
+    if (matchesETag(ifNoneMatch, etag)) {
+      response.status(HttpStatus.NOT_MODIFIED);
+      return;
+    }
+    response.setHeader('ETag', etag);
     return this.publicationService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(
+    @Param('id') id: string,
+    @Headers('if-none-match') ifNoneMatch: string | undefined,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const etag = await this.publicationService.getDetailETag(+id);
+    if (etag && matchesETag(ifNoneMatch, etag)) {
+      response.status(HttpStatus.NOT_MODIFIED);
+      return;
+    }
+    if (etag) {
+      response.setHeader('ETag', etag);
+    }
     return this.publicationService.findOne(+id);
   }
 
