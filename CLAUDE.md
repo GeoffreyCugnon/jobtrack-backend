@@ -72,7 +72,7 @@ La partie messagerie a été extraite dans un micro-service séparé (`../../MS-
 
 ## CORS
 
-`main.ts` n'utilise pas une origine fixe : la fonction `origin` d'`enableCors` autorise dynamiquement toute origine `http(s)://(localhost|127.0.0.1):<port quelconque>` via une regex, `credentials: true`. Objectif : ne pas avoir à retoucher `main.ts` quand le port du Frontend change (5173 → 5174 en fallback Vite, par ex.). Toute origine non-locale reste rejetée — à revoir explicitement avant un déploiement (ajouter le domaine de prod à la regex/whitelist).
+`main.ts` n'utilise pas une origine fixe : la fonction `origin` d'`enableCors` autorise dynamiquement toute origine `http(s)://(localhost|127.0.0.1):<port quelconque>` via une regex, plus l'origine exacte lue dans `process.env.FRONTEND_URL` (même variable que le lien de reset password, cf. Module Auth) — `credentials: true`. Objectif : ne pas avoir à retoucher `main.ts` ni quand le port du Frontend change en dev (5173 → 5174 en fallback Vite), ni entre environnements (il suffit de renseigner `FRONTEND_URL` dans le `.env` de chaque environnement). Toute autre origine reste rejetée.
 
 ## Gestion d'erreurs centralisée
 
@@ -175,6 +175,14 @@ Modules réellement câblés : `auth`, `user`, `company`, `notification`, `role`
 - `mysql2` (top-level, `^2.3.3`) — correctif en 3.24.4, mais version gardée à dessein (cf. plus haut, utilisée uniquement par les scripts de seed) ; `--force` casserait ce choix.
 - `multer` (via `@nestjs/platform-express`) — ferait redescendre `@nestjs/core` en 7.5.5 ; de toute façon **non utilisé** dans le code (`grep` ne trouve aucun `multer`/`FileInterceptor`).
 - Le reste (`vitest`/`@vitest/mocker`, `valibot`, `deepmerge-ts`, `@prisma/dev`, `@prisma/config`, `hono`) : outillage interne du CLI `prisma`/`vitest` (devDependencies, jamais embarqué dans l'app qui tourne).
+
+## Déploiement (AWS, septembre 2026)
+
+Voir `../CLAUDE.md` §Déploiement pour la vue d'ensemble (EC2, ECR, `infra/`, GitLab CI). Spécifique à ce repo :
+
+- `Dockerfile` multi-stage (`node:20-alpine`), `docker-compose.yml` (service `backend` + service `migrate` one-shot), `.gitlab-ci.yml`, `.env.example`.
+- `prisma` est en **dependency** (pas devDependency, contrairement à la convention habituelle) : nécessaire pour que `npx prisma migrate deploy` tourne depuis l'image runtime finale (service `migrate`), sans rebuild depuis les sources sur le serveur.
+- `DATABASE_URL` de prod pointe vers le service `mysql-db` de `../infra/` (MySQL 8, pas MariaDB serveur malgré l'adaptateur `@prisma/adapter-mariadb`, cf. section Stack).
 
 ## Workflow Git
 

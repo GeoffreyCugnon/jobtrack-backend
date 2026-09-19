@@ -12,8 +12,15 @@ async function bootstrap() {
       callback: (err: Error | null, allow?: boolean) => void,
     ) => {
       const localOriginPattern = /^https?:\/\/(localhost|127\.0\.0\.1):\d+$/;
+      // Origine de prod : même variable que le lien de reset password
+      // (voir auth.controller.ts), pas de valeur en dur ici.
+      const prodOrigin = process.env.FRONTEND_URL;
 
-      if (!origin || localOriginPattern.test(origin)) {
+      if (
+        !origin ||
+        localOriginPattern.test(origin) ||
+        (prodOrigin && origin === prodOrigin)
+      ) {
         callback(null, true);
         return;
       }

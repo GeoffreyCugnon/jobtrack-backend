@@ -1,0 +1,30 @@
+# Déploiement prod du Backend sur jobtrack-server.
+# Image poussée sur ECR par .gitlab-ci.yml ; ce fichier ne fait que la lancer.
+# Prérequis sur le serveur : réseau `jobtrack-network` (créé une fois via
+# `docker network create jobtrack-network`) + infra/ (MySQL) déjà démarrée
+# (voir ../infra/README.md) + .env local (copié depuis .env.example).
+
+services:
+  migrate:
+    image: ${ECR_REGISTRY}/jobtrack-backend:${IMAGE_TAG:-latest}
+    command: ['npx', 'prisma', 'migrate', 'deploy']
+    env_file: .env
+    networks:
+      - jobtrack-network
+    restart: 'no'
+
+  backend:
+    image: ${ECR_REGISTRY}/jobtrack-backend:${IMAGE_TAG:-latest}
+    env_file: .env
+    ports:
+      - '${BACKEND_PORT:-3000}:3000'
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - jobtrack-network
+    restart: unless-stopped
+
+networks:
+  jobtrack-network:
+    external: true

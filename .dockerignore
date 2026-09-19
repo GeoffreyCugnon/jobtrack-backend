@@ -1,0 +1,13 @@
+node_modules
+dist
+coverage
+.git
+.gitignore
+.env
+*.log
+Claude outputs
+CLAUDE.md
+README.md
+bruno
+test
+**/*.spec.ts
