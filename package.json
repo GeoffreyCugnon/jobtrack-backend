@@ -15,6 +15,7 @@
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "prisma:seed": "node prisma/seed.js",
     "prisma:seed:admin": "node prisma/seed-admin.js",
+    "prisma:seed:publications": "node prisma/seed-publications.js",
     "prisma:seed:connections": "node prisma/seed-connections.js",
     "prisma:seed:avatars": "node prisma/seed-avatars.js",
     "prisma:seed:activity": "node prisma/seed-activity.js",
