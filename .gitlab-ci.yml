@@ -21,8 +21,11 @@ build:
     # on récupère le token ECR en lançant l'image AWS CLI officielle via le
     # daemon dind déjà utilisé juste après pour build/push — aucun souci de
     # compat puisqu'elle tourne dans son propre conteneur (glibc).
-    - export AWS_ACCESS_KEY_ID="$GITLAB_AWS_ACCESS_KEY_ID"
-    - export AWS_SECRET_ACCESS_KEY="$GITLAB_AWS_SECRET_ACCESS_KEY"
+    # Trim défensif : un espace/saut de ligne parasite dans la variable GitLab
+    # (copier-coller depuis la console AWS) suffit à faire échouer la
+    # signature SigV4 avec InvalidSignatureException.
+    - export AWS_ACCESS_KEY_ID="$(printf '%s' "$GITLAB_AWS_ACCESS_KEY_ID" | tr -d '[:space:]')"
+    - export AWS_SECRET_ACCESS_KEY="$(printf '%s' "$GITLAB_AWS_SECRET_ACCESS_KEY" | tr -d '[:space:]')"
     # Le pull anonyme depuis public.ecr.aws peut être throttlé par intermittence
     # (IP de runner partagée) -> retry avec backoff avant de lancer le conteneur.
     - |
