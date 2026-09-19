@@ -4,9 +4,9 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { Prisma } from '../../prisma/generated/prisma/client';
-import { Application_status } from '../../prisma/generated/prisma/enums';
+import { PrismaService } from '../prisma/prisma.service';
+import { Prisma } from '../generated/prisma/client';
+import { Application_status } from '../generated/prisma/enums';
 import { CreateApplicationDto } from './dto/create-application.dto';
 import { UpdateApplicationDto } from './dto/update-application.dto';
 import { assertOwnership } from '../utils/ownership';
@@ -61,7 +61,8 @@ export class ApplicationService {
       status: row.status,
       statusLabel: STATUS_LABEL[row.status],
       interviewsCount: row.interview.length,
-      latestInterviewScheduledAt: latestInterviewScheduledAt?.toISOString() ?? null,
+      latestInterviewScheduledAt:
+        latestInterviewScheduledAt?.toISOString() ?? null,
       appliedDate: createdAt.toLocaleDateString('fr-FR'),
       createdAt: createdAt.toISOString(),
     };

@@ -1,6 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { Prisma, User } from '../../prisma/generated/prisma/client';
-import { PrismaService } from '../../prisma/prisma.service';
+import { Prisma, User } from '../generated/prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 import { SafeUser } from './interface/safe-user';
 import { RegisterDto } from '../auth/dto/register.dto';
 import { generateAvatarUrl, SAFE_USER_OMIT } from './user.utils';

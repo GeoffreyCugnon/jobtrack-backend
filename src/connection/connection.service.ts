@@ -3,8 +3,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { Prisma } from '../../prisma/generated/prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
+import { Prisma } from '../generated/prisma/client';
 import { buildETag } from '../utils/etag';
 
 /** Champs d'utilisateur exposés dans une relation (jamais de hash / jetons). */

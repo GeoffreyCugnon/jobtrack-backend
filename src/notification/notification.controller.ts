@@ -11,7 +11,7 @@ import {
 import { NotificationService } from './notification.service';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import type { IRequestWithPayload } from '../auth/interface';
-import { Notification } from '../../prisma/generated/prisma/client';
+import { Notification } from '../generated/prisma/client';
 
 @UseGuards(AuthGuard)
 @Controller('notifications')

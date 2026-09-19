@@ -14,7 +14,7 @@ import { InterviewModule } from './interview/interview.module';
 import { JobCategoryModule } from './job_category/job_category.module';
 import { JobOfferingModule } from './job_offering/job_offering.module';
 import { NotificationModule } from './notification/notification.module';
-import { PrismaModule } from '../prisma/prisma.module';
+import { PrismaModule } from './prisma/prisma.module';
 import { PublicationModule } from './publication/publication.module';
 import { RoleModule } from './role/role.module';
 import { SkillModule } from './skill/skill.module';

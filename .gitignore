@@ -2,6 +2,7 @@
 /dist
 /node_modules
 /build
+*.tsbuildinfo
 
 # Logs
 logs
@@ -56,4 +57,4 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # Client Prisma généré (régénéré au `postinstall` via `prisma generate`)
-/prisma/generated
+/src/generated

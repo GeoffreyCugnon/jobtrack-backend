@@ -9,7 +9,7 @@ import { Response } from 'express';
 import { PrismaErrorEnum } from '../enum/prismaError';
 // Use the official Prisma client package for typings. Adjusted to avoid referencing a generated
 // client path that may not exist in some setups (pre-generated or different output dirs).
-import { Prisma } from '../../../prisma/generated/prisma/client';
+import { Prisma } from '../../generated/prisma/client';
 
 /**
  * Forme minimale de l'erreur brute remontée par l'adaptateur (mariadb) et

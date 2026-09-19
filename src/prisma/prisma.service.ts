@@ -5,7 +5,7 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
-import { PrismaClient } from './generated/prisma/client';
+import { PrismaClient } from '../generated/prisma/client';
 
 /**
  * Le serveur MySQL utilise l'auth `caching_sha2_password` sans TLS : sans ce

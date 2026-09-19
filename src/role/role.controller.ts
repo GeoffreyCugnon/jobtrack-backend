@@ -12,7 +12,7 @@ import {
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
-import { Role } from '../../prisma/generated/prisma/client';
+import { Role } from '../generated/prisma/client';
 import { AuthGuard } from '../auth/guards/auth.guard';
 
 @UseGuards(AuthGuard)

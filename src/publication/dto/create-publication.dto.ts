@@ -6,7 +6,7 @@ import {
   IsString,
   MaxLength,
 } from 'class-validator';
-import { Publication_type } from '../../../prisma/generated/prisma/enums';
+import { Publication_type } from '../../generated/prisma/enums';
 
 export class CreatePublicationDto {
   @IsNotEmpty()

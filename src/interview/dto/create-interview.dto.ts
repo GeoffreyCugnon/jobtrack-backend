@@ -7,7 +7,7 @@ import {
   IsString,
   MaxLength,
 } from 'class-validator';
-import { Interview_interview_type } from '../../../prisma/generated/prisma/enums';
+import { Interview_interview_type } from '../../generated/prisma/enums';
 
 export class CreateInterviewDto {
   @IsInt()

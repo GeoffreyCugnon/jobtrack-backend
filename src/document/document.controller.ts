@@ -17,7 +17,7 @@ import type { Response } from 'express';
 import { DocumentService } from './document.service';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
-import { Document_type } from '../../prisma/generated/prisma/enums';
+import { Document_type } from '../generated/prisma/enums';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import type { IRequestWithPayload } from '../auth/interface';
 import { matchesETag } from '../utils/etag';

@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto';
-import { User } from '../../prisma/generated/prisma/client';
+import { User } from '../generated/prisma/client';
 import { SafeUser } from './interface/safe-user';
 
 /**

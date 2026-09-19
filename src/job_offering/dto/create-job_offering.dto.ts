@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsString, MaxLength } from 'class-validator';
-import { Job_offering_contract_type } from '../../../prisma/generated/prisma/enums';
+import { Job_offering_contract_type } from '../../generated/prisma/enums';
 
 export class CreateJobOfferingDto {
   @IsNotEmpty()

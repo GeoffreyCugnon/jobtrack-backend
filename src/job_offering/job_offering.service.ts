@@ -3,8 +3,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { Prisma } from '../../prisma/generated/prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
+import { Prisma } from '../generated/prisma/client';
 import { CreateJobOfferingDto } from './dto/create-job_offering.dto';
 import { UpdateJobOfferingDto } from './dto/update-job_offering.dto';
 import { buildETag } from '../utils/etag';

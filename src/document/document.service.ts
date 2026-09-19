@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { Prisma } from '../../prisma/generated/prisma/client';
-import { Document_type } from '../../prisma/generated/prisma/enums';
+import { PrismaService } from '../prisma/prisma.service';
+import { Prisma } from '../generated/prisma/client';
+import { Document_type } from '../generated/prisma/enums';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
 import { assertOwnership } from '../utils/ownership';

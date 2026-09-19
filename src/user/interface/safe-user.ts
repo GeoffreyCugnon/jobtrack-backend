@@ -1,4 +1,4 @@
-import { User } from '../../../prisma/generated/prisma/client';
+import { User } from '../../generated/prisma/client';
 
 /**
  * `User` sans aucun champ sensible (hash de mot de passe, jetons refresh et

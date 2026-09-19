@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
-import { PrismaService } from '../../prisma/prisma.service';
-import { Company } from '../../prisma/generated/prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
+import { Company } from '../generated/prisma/client';
 import { buildETag } from '../utils/etag';
 
 @Injectable()

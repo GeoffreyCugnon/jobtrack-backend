@@ -18,7 +18,7 @@ import { LoginDto } from './dto/login.dto';
 import { UserService } from '../user/user.service';
 import type { Response } from 'express';
 import type { Request } from 'express';
-import { User } from '../../prisma/generated/prisma/client';
+import { User } from '../generated/prisma/client';
 import { AuthGuard } from './guards/auth.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
