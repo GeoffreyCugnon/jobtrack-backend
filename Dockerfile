@@ -4,6 +4,10 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 COPY package.json package-lock.json ./
+# prisma/ doit être présent AVANT le npm ci : le postinstall (`prisma generate`)
+# a besoin de prisma/schema.prisma pour s'exécuter, même en stage builder.
+COPY prisma ./prisma
+COPY prisma.config.ts ./prisma.config.ts
 RUN npm ci
 COPY . .
 RUN npx prisma generate && npm run build
