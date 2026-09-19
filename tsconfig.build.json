@@ -1,7 +1,15 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "rootDir": "./src"
+    "rootDir": "./src",
+    // nest-cli.json a deleteOutDir: true : à chaque `nest start --watch` /
+    // `nest build`, dist/ est vidé avant compilation, mais le cache
+    // incrémental (tsconfig.build.tsbuildinfo) vit à la racine du repo, pas
+    // dans dist/ — deleteOutDir ne le supprime donc jamais avec lui. tsc
+    // incrémental voit alors "sources inchangées depuis le dernier build
+    // réussi" et saute l'émission, alors que dist/ vient d'être vidé :
+    // "Cannot find module dist/main" au démarrage suivant, à chaque fois.
+    "incremental": false
   },
   "exclude": [
     "node_modules",
