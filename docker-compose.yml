@@ -16,8 +16,9 @@ services:
   backend:
     image: ${ECR_REGISTRY}/jobtrack-backend:${IMAGE_TAG:-latest}
     env_file: .env
+    # Joignable uniquement via le Nginx de l'hôte (infra/nginx/jobtrack.conf).
     ports:
-      - '${BACKEND_PORT:-3000}:3000'
+      - '127.0.0.1:${BACKEND_PORT:-3000}:3000'
     depends_on:
       migrate:
         condition: service_completed_successfully
